@@ -19,12 +19,18 @@ L.Icon.Default.mergeOptions({
 interface MapViewProps {
   routePoints: RoutePoint[];
   currentPosition: { lat: number; lng: number };
+  progressPercent?: number;
 }
 
-export const MapView = ({ routePoints, currentPosition }: MapViewProps) => {
+export const MapView = ({
+  routePoints,
+  currentPosition,
+  progressPercent = 0,
+}: MapViewProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
-  const routeLayerRef = useRef<L.Polyline | null>(null);
+  const completedRouteRef = useRef<L.Polyline | null>(null);
+  const remainingRouteRef = useRef<L.Polyline | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
 
   useEffect(() => {
@@ -50,9 +56,12 @@ export const MapView = ({ routePoints, currentPosition }: MapViewProps) => {
   useEffect(() => {
     if (!mapInstance.current || routePoints.length === 0) return;
 
-    // Remove existing route layer if any
-    if (routeLayerRef.current) {
-      routeLayerRef.current.remove();
+    // Remove existing route layers if any
+    if (completedRouteRef.current) {
+      completedRouteRef.current.remove();
+    }
+    if (remainingRouteRef.current) {
+      remainingRouteRef.current.remove();
     }
 
     // Convert route points to Leaflet LatLng format
@@ -61,18 +70,70 @@ export const MapView = ({ routePoints, currentPosition }: MapViewProps) => {
       point.longitude,
     ]);
 
-    // Add route polyline
-    routeLayerRef.current = L.polyline(latLngs, {
-      color: "#667eea",
-      weight: 4,
-      opacity: 0.7,
-    }).addTo(mapInstance.current);
+    // Calculate the split point based on progress percentage
+    const splitIndex = Math.floor((progressPercent / 100) * routePoints.length);
 
-    // Fit map to route bounds
-    mapInstance.current.fitBounds(routeLayerRef.current.getBounds(), {
-      padding: [50, 50],
-    });
-  }, [routePoints]);
+    if (splitIndex > 0) {
+      // Completed portion (green)
+      const completedLatLngs = latLngs.slice(0, splitIndex + 1);
+      completedRouteRef.current = L.polyline(completedLatLngs, {
+        color: "#48bb78", // Green for completed
+        weight: 5,
+        opacity: 0.9,
+      }).addTo(mapInstance.current);
+    }
+
+    if (splitIndex < routePoints.length - 1) {
+      // Remaining portion (gray)
+      const remainingLatLngs = latLngs.slice(splitIndex);
+      remainingRouteRef.current = L.polyline(remainingLatLngs, {
+        color: "blue", // Gray for remaining
+        weight: 4,
+        opacity: 0.6,
+      }).addTo(mapInstance.current);
+    }
+
+    // Add Start/Finish marker at Matara (first and last point)
+    if (routePoints.length > 0) {
+      const startPoint = routePoints[0];
+
+      // Create custom icon for start/finish
+      const startFinishIcon = L.divIcon({
+        html: `
+          <div style="position: relative;">
+            <div style="
+              font-size: 32px;
+              text-align: center;
+              filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            ">🏁</div>
+          </div>
+        `,
+        className: "start-finish-marker",
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+      });
+
+      L.marker([startPoint.latitude, startPoint.longitude], {
+        icon: startFinishIcon,
+      })
+        .addTo(mapInstance.current)
+        .bindPopup(
+          `<div style="text-align: center; padding: 5px;">
+            <strong style="font-size: 16px;">🏁 Start/Finish</strong><br/>
+            <span style="color: #667eea; font-weight: 600;">Matara</span><br/>
+            <span style="font-size: 12px; color: #718096;">Complete the loop!</span>
+          </div>`
+        );
+    }
+
+    // Fit map to route bounds (use completed route if exists, otherwise remaining)
+    const boundsLayer = completedRouteRef.current || remainingRouteRef.current;
+    if (boundsLayer) {
+      mapInstance.current.fitBounds(boundsLayer.getBounds(), {
+        padding: [50, 50],
+      });
+    }
+  }, [routePoints, progressPercent]);
 
   useEffect(() => {
     if (!mapInstance.current) return;

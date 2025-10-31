@@ -41,6 +41,11 @@
   animation: bounce 2s ease-in-out infinite;
 }
 
+.start-finish-marker {
+  background: none;
+  border: none;
+}
+
 @keyframes bounce {
   0%,
   100% {
@@ -48,6 +53,16 @@
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
   }
 }
 

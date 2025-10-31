@@ -114,7 +114,9 @@ export const Dashboard = () => {
 
       <div className="dashboard-content">
         <div className="stats-section">
-          <h2 style={{ fontSize: '28px', marginBottom: '30px' }}>Welcome, {progress.username}! 👋</h2>
+          <h2 style={{ fontSize: "28px", marginBottom: "30px" }}>
+            Welcome, {progress.username.split(":")[1]}! 👋
+          </h2>
           <div className="stats-grid">
             <StatsCard
               title="Distance Covered"
@@ -154,6 +156,7 @@ export const Dashboard = () => {
               lat: progress.currentLat,
               lng: progress.currentLng,
             }}
+            progressPercent={progress.progressPercent}
           />
         </div>
       </div>
