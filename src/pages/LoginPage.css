@@ -1,0 +1,102 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.login-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.login-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+.login-content {
+  padding: 40px 30px;
+}
+
+.feature-list {
+  margin-bottom: 30px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+  font-size: 15px;
+  color: #4a5568;
+}
+
+.feature-icon {
+  font-size: 24px;
+}
+
+.strava-login-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: #fc4c02;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.strava-login-btn:hover {
+  background: #e04402;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(252, 76, 2, 0.4);
+}
+
+.strava-login-btn:active {
+  transform: translateY(0);
+}
+
+.privacy-note {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #718096;
+}
+
+.error-message {
+  margin: 20px 30px 0;
+  padding: 12px 16px;
+  background: #fed7d7;
+  color: #c53030;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
