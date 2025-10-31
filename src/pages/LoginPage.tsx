@@ -14,6 +14,7 @@ export const LoginPage = () => {
     if (userId) {
       navigate("/dashboard");
     }
+    console.log("Login url:", api.getStravaLoginUrl());
   }, [navigate]);
 
   const handleStravaLogin = () => {
