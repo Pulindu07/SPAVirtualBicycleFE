@@ -1,18 +1,18 @@
-import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '../api/client';
-import './LoginPage.css';
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { api } from "../api/client";
+import "./LoginPage.css";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const error = searchParams.get('error');
+  const error = searchParams.get("error");
 
   useEffect(() => {
     // Check if user is already logged in
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     if (userId) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [navigate]);
 
@@ -25,13 +25,16 @@ export const LoginPage = () => {
       <div className="login-card">
         <div className="login-header">
           <h1>🚴 Virtual Sri Lanka Ride Tracker</h1>
-          <p className="subtitle">Track your cycling journey around the beautiful coast of Sri Lanka</p>
+          <p className="subtitle">
+            Track your cycling journey around the beautiful coast of Sri Lanka
+          </p>
         </div>
 
         {error && (
           <div className="error-message">
-            {error === 'access_denied' && 'Authentication was cancelled'}
-            {error === 'authentication_failed' && 'Authentication failed. Please try again'}
+            {error === "access_denied" && "Authentication was cancelled"}
+            {error === "authentication_failed" &&
+              "Authentication failed. Please try again"}
           </div>
         )}
 
@@ -63,11 +66,11 @@ export const LoginPage = () => {
           </button>
 
           <p className="privacy-note">
-            We only access your cycling activities. Your data is secure and private.
+            We only access your cycling activities. Your data is secure and
+            private.
           </p>
         </div>
       </div>
     </div>
   );
 };
-

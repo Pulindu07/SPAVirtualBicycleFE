@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { MapView } from '../components/MapView';
-import { StatsCard } from '../components/StatsCard';
-import { useUserProgress } from '../hooks/useUserProgress';
-import { useRouteData } from '../hooks/useRouteData';
-import { api } from '../api/client';
-import './Dashboard.css';
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { MapView } from "../components/MapView";
+import { StatsCard } from "../components/StatsCard";
+import { useUserProgress } from "../hooks/useUserProgress";
+import { useRouteData } from "../hooks/useRouteData";
+import { api } from "../api/client";
+import "./Dashboard.css";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -13,23 +13,28 @@ export const Dashboard = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [syncing, setSyncing] = useState(false);
 
-  const { progress, loading: progressLoading, error: progressError, refetch } = useUserProgress(userId);
+  const {
+    progress,
+    loading: progressLoading,
+    error: progressError,
+    refetch,
+  } = useUserProgress(userId);
   const { routePoints, routeLength, loading: routeLoading } = useRouteData();
 
   useEffect(() => {
     // Get userId from URL or localStorage
-    const userIdFromUrl = searchParams.get('userId');
-    const userIdFromStorage = localStorage.getItem('userId');
+    const userIdFromUrl = searchParams.get("userId");
+    const userIdFromStorage = localStorage.getItem("userId");
 
     if (userIdFromUrl) {
-      localStorage.setItem('userId', userIdFromUrl);
+      localStorage.setItem("userId", userIdFromUrl);
       setUserId(parseInt(userIdFromUrl));
       // Clean up URL
-      navigate('/dashboard', { replace: true });
+      navigate("/dashboard", { replace: true });
     } else if (userIdFromStorage) {
       setUserId(parseInt(userIdFromStorage));
     } else {
-      navigate('/');
+      navigate("/");
     }
   }, [searchParams, navigate]);
 
@@ -40,18 +45,18 @@ export const Dashboard = () => {
       setSyncing(true);
       await api.syncUserActivities(userId);
       await refetch();
-      alert('Activities synced successfully!');
+      alert("Activities synced successfully!");
     } catch (error) {
-      console.error('Sync failed:', error);
-      alert('Failed to sync activities. Please try again.');
+      console.error("Sync failed:", error);
+      alert("Failed to sync activities. Please try again.");
     } finally {
       setSyncing(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userId');
-    navigate('/');
+    localStorage.removeItem("userId");
+    navigate("/");
   };
 
   const formatTime = (seconds: number): string => {
@@ -77,7 +82,7 @@ export const Dashboard = () => {
       <div className="dashboard-container">
         <div className="error-container">
           <p>Error loading progress data</p>
-          <button onClick={() => navigate('/')}>Back to Login</button>
+          <button onClick={() => navigate("/")}>Back to Login</button>
         </div>
       </div>
     );
@@ -93,12 +98,12 @@ export const Dashboard = () => {
         <div className="header-content">
           <h1>🚴 Virtual Sri Lanka Ride</h1>
           <div className="header-actions">
-            <button 
-              className="sync-btn" 
+            <button
+              className="sync-btn"
               onClick={handleSync}
               disabled={syncing}
             >
-              {syncing ? '🔄 Syncing...' : '🔄 Sync Now'}
+              {syncing ? "🔄 Syncing..." : "🔄 Sync Now"}
             </button>
             <button className="logout-btn" onClick={handleLogout}>
               Logout
@@ -136,18 +141,22 @@ export const Dashboard = () => {
               color="#43e97b"
             />
           </div>
-          <p className="last-sync">Last synced: {new Date(progress.lastSync).toLocaleString()}</p>
+          <p className="last-sync">
+            Last synced: {new Date(progress.lastSync).toLocaleString()}
+          </p>
         </div>
 
         <div className="map-section">
           <h2>Your Virtual Location</h2>
           <MapView
             routePoints={routePoints}
-            currentPosition={{ lat: progress.currentLat, lng: progress.currentLng }}
+            currentPosition={{
+              lat: progress.currentLat,
+              lng: progress.currentLng,
+            }}
           />
         </div>
       </div>
     </div>
   );
 };
-

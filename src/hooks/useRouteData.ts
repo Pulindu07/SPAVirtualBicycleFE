@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import { RoutePoint } from '../types';
+import { useState, useEffect } from "react";
+import { api } from "../api/client";
+import { RoutePoint } from "../types";
 
 export const useRouteData = () => {
   const [routePoints, setRoutePoints] = useState<RoutePoint[]>([]);
@@ -20,7 +20,7 @@ export const useRouteData = () => {
         setRoutePoints(points);
         setRouteLength(length);
       } catch (err) {
-        setError('Failed to fetch route data');
+        setError("Failed to fetch route data");
         console.error(err);
       } finally {
         setLoading(false);
@@ -32,4 +32,3 @@ export const useRouteData = () => {
 
   return { routePoints, routeLength, loading, error };
 };
-

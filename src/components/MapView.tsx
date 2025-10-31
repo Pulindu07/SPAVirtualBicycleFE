@@ -1,13 +1,13 @@
-import { useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { RoutePoint } from '../types';
-import './MapView.css';
+import { useEffect, useRef } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { RoutePoint } from "../types";
+import "./MapView.css";
 
 // Fix for default marker icons in Leaflet with Vite
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -34,8 +34,8 @@ export const MapView = ({ routePoints, currentPosition }: MapViewProps) => {
     mapInstance.current = L.map(mapRef.current).setView([7.8731, 80.7718], 8);
 
     // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
       maxZoom: 19,
     }).addTo(mapInstance.current);
 
@@ -56,14 +56,14 @@ export const MapView = ({ routePoints, currentPosition }: MapViewProps) => {
     }
 
     // Convert route points to Leaflet LatLng format
-    const latLngs: L.LatLngExpression[] = routePoints.map(point => [
+    const latLngs: L.LatLngExpression[] = routePoints.map((point) => [
       point.latitude,
       point.longitude,
     ]);
 
     // Add route polyline
     routeLayerRef.current = L.polyline(latLngs, {
-      color: '#667eea',
+      color: "#667eea",
       weight: 4,
       opacity: 0.7,
     }).addTo(mapInstance.current);
@@ -84,7 +84,7 @@ export const MapView = ({ routePoints, currentPosition }: MapViewProps) => {
 
     // Create custom cyclist icon
     const cyclistIcon = L.divIcon({
-      className: 'cyclist-marker',
+      className: "cyclist-marker",
       html: '<div class="cyclist-icon">🚴</div>',
       iconSize: [40, 40],
       iconAnchor: [20, 20],
@@ -108,4 +108,3 @@ export const MapView = ({ routePoints, currentPosition }: MapViewProps) => {
 
   return <div ref={mapRef} className="map-container" />;
 };
-

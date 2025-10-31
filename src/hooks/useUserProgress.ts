@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import { UserProgress } from '../types';
+import { useState, useEffect } from "react";
+import { api } from "../api/client";
+import { UserProgress } from "../types";
 
 export const useUserProgress = (userId: number | null) => {
   const [progress, setProgress] = useState<UserProgress | null>(null);
@@ -19,7 +19,7 @@ export const useUserProgress = (userId: number | null) => {
       const data = await api.getUserProgress(userId);
       setProgress(data);
     } catch (err) {
-      setError('Failed to fetch user progress');
+      setError("Failed to fetch user progress");
       console.error(err);
     } finally {
       setLoading(false);
@@ -36,4 +36,3 @@ export const useUserProgress = (userId: number | null) => {
 
   return { progress, loading, error, refetch };
 };
-

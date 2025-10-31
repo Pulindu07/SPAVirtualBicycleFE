@@ -1,4 +1,4 @@
-import './StatsCard.css';
+import "./StatsCard.css";
 
 interface StatsCardProps {
   title: string;
@@ -20,4 +20,3 @@ export const StatsCard = ({ title, value, icon, color }: StatsCardProps) => {
     </div>
   );
 };
-
