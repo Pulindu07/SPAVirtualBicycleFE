@@ -114,7 +114,7 @@ export const Dashboard = () => {
 
       <div className="dashboard-content">
         <div className="stats-section">
-          <h2>Welcome, {progress.username}! 👋</h2>
+          <h2 style={{ fontSize: '28px', marginBottom: '30px' }}>Welcome, {progress.username}! 👋</h2>
           <div className="stats-grid">
             <StatsCard
               title="Distance Covered"

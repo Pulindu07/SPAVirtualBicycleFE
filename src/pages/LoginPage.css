@@ -16,6 +16,17 @@
   overflow: hidden;
 }
 
+/* Mobile */
+@media (max-width: 640px) {
+  .login-container {
+    padding: 15px;
+  }
+  
+  .login-card {
+    border-radius: 16px;
+  }
+}
+
 .login-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -39,6 +50,25 @@
   padding: 40px 30px;
 }
 
+/* Mobile */
+@media (max-width: 640px) {
+  .login-header {
+    padding: 30px 20px;
+  }
+  
+  .login-header h1 {
+    font-size: 24px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+  }
+  
+  .login-content {
+    padding: 30px 20px;
+  }
+}
+
 .feature-list {
   margin-bottom: 30px;
 }
@@ -54,6 +84,20 @@
 
 .feature-icon {
   font-size: 24px;
+  flex-shrink: 0;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .feature-item {
+    font-size: 14px;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .feature-icon {
+    font-size: 20px;
+  }
 }
 
 .strava-login-btn {
@@ -81,6 +125,20 @@
 
 .strava-login-btn:active {
   transform: translateY(0);
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .strava-login-btn {
+    padding: 14px 20px;
+    font-size: 15px;
+    gap: 10px;
+  }
+  
+  .strava-login-btn svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .privacy-note {
