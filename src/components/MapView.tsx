@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { RoutePoint } from "../types";
+import type { RoutePoint } from "../types";
 import "./MapView.css";
 
 // Fix for default marker icons in Leaflet with Vite

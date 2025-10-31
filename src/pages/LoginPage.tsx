@@ -34,7 +34,12 @@ export const LoginPage = () => {
           <div className="error-message">
             {error === "access_denied" && "Authentication was cancelled"}
             {error === "authentication_failed" &&
-              "Authentication failed. Please try again"}
+              "Authentication failed. Please check the backend logs and try again."}
+            {error === "no_code" &&
+              "No authorization code received from Strava"}
+            {!["access_denied", "authentication_failed", "no_code"].includes(
+              error
+            ) && `Error: ${error}`}
           </div>
         )}
 

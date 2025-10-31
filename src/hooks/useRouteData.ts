@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
-import { RoutePoint } from "../types";
+import type { RoutePoint } from "../types";
 
 export const useRouteData = () => {
   const [routePoints, setRoutePoints] = useState<RoutePoint[]>([]);

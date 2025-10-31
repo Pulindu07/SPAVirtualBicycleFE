@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
-import { UserProgress } from "../types";
+import type { UserProgress } from "../types";
 
 export const useUserProgress = (userId: number | null) => {
   const [progress, setProgress] = useState<UserProgress | null>(null);
