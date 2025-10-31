@@ -115,7 +115,11 @@ export const Dashboard = () => {
       <div className="dashboard-content">
         <div className="stats-section">
           <h2 style={{ fontSize: "28px", marginBottom: "30px" }}>
-            Welcome, {progress.username.split(":")[1]}! 👋
+            Welcome,{" "}
+            {progress.firstName && progress.lastName
+              ? `${progress.firstName} ${progress.lastName}`
+              : progress.username}
+            ! 👋
           </h2>
           <div className="stats-grid">
             <StatsCard

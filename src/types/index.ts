@@ -11,4 +11,6 @@ export interface UserProgress {
   currentLng: number;
   lastSync: string;
   username: string;
+  firstName: string;
+  lastName: string;
 }

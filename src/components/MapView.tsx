@@ -136,11 +136,34 @@ export const MapView = ({
   }, [routePoints, progressPercent]);
 
   useEffect(() => {
-    if (!mapInstance.current) return;
+    if (!mapInstance.current || routePoints.length === 0) return;
 
     // Remove existing marker if any
     if (markerRef.current) {
       markerRef.current.remove();
+    }
+
+    // Calculate the exact position on the route based on progress percentage
+    const routeIndex = Math.floor((progressPercent / 100) * routePoints.length);
+    const clampedIndex = Math.min(routeIndex, routePoints.length - 1);
+    const exactPosition = routePoints[clampedIndex];
+
+    // If we have a next point, interpolate between current and next for smoother positioning
+    let lat = exactPosition.latitude;
+    let lng = exactPosition.longitude;
+
+    if (clampedIndex < routePoints.length - 1) {
+      const nextPoint = routePoints[clampedIndex + 1];
+      const segmentProgress =
+        (progressPercent / 100) * routePoints.length - clampedIndex;
+
+      // Linear interpolation between current point and next point
+      lat =
+        exactPosition.latitude +
+        (nextPoint.latitude - exactPosition.latitude) * segmentProgress;
+      lng =
+        exactPosition.longitude +
+        (nextPoint.longitude - exactPosition.longitude) * segmentProgress;
     }
 
     // Create custom cyclist icon
@@ -151,21 +174,21 @@ export const MapView = ({
       iconAnchor: [20, 20],
     });
 
-    // Add marker for current position
-    markerRef.current = L.marker([currentPosition.lat, currentPosition.lng], {
+    // Add marker at the calculated position
+    markerRef.current = L.marker([lat, lng], {
       icon: cyclistIcon,
     }).addTo(mapInstance.current);
 
     // Add popup with current location
     markerRef.current.bindPopup(
-      `<strong>Your Current Position</strong><br/>Lat: ${currentPosition.lat.toFixed(
-        4
-      )}<br/>Lng: ${currentPosition.lng.toFixed(4)}`
+      `<strong>Your Current Position</strong><br/>Progress: ${progressPercent.toFixed(
+        2
+      )}%<br/>Lat: ${lat.toFixed(4)}<br/>Lng: ${lng.toFixed(4)}`
     );
 
     // Pan to current position
-    mapInstance.current.panTo([currentPosition.lat, currentPosition.lng]);
-  }, [currentPosition]);
+    mapInstance.current.panTo([lat, lng]);
+  }, [routePoints, progressPercent, currentPosition]);
 
   return <div ref={mapRef} className="map-container" />;
 };
