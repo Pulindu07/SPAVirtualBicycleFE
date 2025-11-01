@@ -10,7 +10,7 @@ const apiClient = axios.create({
     "Content-Type": "application/json",
   },
 });
-
+// Define API methods
 export const api = {
   // Auth
   getStravaLoginUrl: () => `${API_BASE_URL}/auth/strava/login`,
