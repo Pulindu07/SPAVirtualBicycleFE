@@ -4,16 +4,14 @@ import "./MapViewGoogleMaps.css";
 
 interface MapViewGoogleMapsProps {
   routePoints: RoutePoint[];
-  currentPosition: { lat: number; lng: number };
   progressPercent?: number;
-  coveredDistanceKm: number; // Add coveredDistanceKm prop
+  coveredDistanceKm: number;
 }
 
 export const MapViewGoogleMaps = ({
   routePoints,
-  currentPosition,
   progressPercent = 0,
-  coveredDistanceKm, // Use the new prop
+  coveredDistanceKm,
 }: MapViewGoogleMapsProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);

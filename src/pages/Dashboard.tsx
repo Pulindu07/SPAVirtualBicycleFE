@@ -164,10 +164,6 @@ export const Dashboard = () => {
           <h2>Your Virtual Location</h2>
           <MapView
             routePoints={routePoints}
-            currentPosition={{
-              lat: progress.currentLat,
-              lng: progress.currentLng,
-            }}
             progressPercent={progress.progressPercent}
             coveredDistanceKm={progress.totalDistanceKm}
           />
