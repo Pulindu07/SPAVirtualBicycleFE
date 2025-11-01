@@ -10,12 +10,13 @@ export default defineConfig({
     assetsDir: "assets",
     sourcemap: false,
     minify: "esbuild",
+    copyPublicDir: true, // Ensure public folder is copied to dist
     rollupOptions: {
       output: {
         manualChunks: undefined,
         entryFileNames: "assets/[name].[hash].js",
         chunkFileNames: "assets/[name].[hash].js",
-        assetFileNames: "assets/[name].[hash].[ext]"
+        assetFileNames: "assets/[name].[hash].[ext]",
       },
     },
   },
