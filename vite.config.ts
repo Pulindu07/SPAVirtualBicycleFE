@@ -1,16 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: "/",
+  base: "./", // use relative pathing
   build: {
     outDir: "dist",
     assetsDir: "assets",
     sourcemap: false,
     minify: "esbuild",
-    copyPublicDir: true, // Ensure public folder is copied to dist
+    copyPublicDir: true,
     rollupOptions: {
       output: {
         manualChunks: undefined,
