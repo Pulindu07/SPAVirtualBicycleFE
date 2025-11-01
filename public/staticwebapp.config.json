@@ -1,31 +1,18 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.{css,scss,js,png,gif,ico,jpg,svg}"]
+    "exclude": [
+      "/images/*.{png,jpg,gif,ico}",
+      "/css/*",
+      "/*.{js,css,json,svg,png,jpg,jpeg,gif,ico,woff,woff2,ttf,eot}"
+    ]
   },
   "mimeTypes": {
     ".json": "application/json",
     ".js": "text/javascript",
-    ".mjs": "text/javascript",
-    ".css": "text/css",
-    ".svg": "image/svg+xml",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".gif": "image/gif",
-    ".ico": "image/x-icon",
-    ".woff": "font/woff",
-    ".woff2": "font/woff2",
-    ".ttf": "font/ttf",
-    ".eot": "application/vnd.ms-fontobject"
+    ".css": "text/css"
   },
   "globalHeaders": {
-    "content-security-policy": "default-src 'self' https://maps.googleapis.com https://maps.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://maps.gstatic.com https://maps.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://maps.googleapis.com https://*.azurestaticapps.net https://*.azurewebsites.net"
-  },
-  "responseOverrides": {
-    "404": {
-      "rewrite": "/index.html",
-      "statusCode": 200
-    }
+    "Cache-Control": "no-cache, no-store, must-revalidate"
   }
 }

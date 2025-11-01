@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { RoutePoint } from "../types";
 import "./MapViewGoogleMaps.css";
-import startPinIcon from "../assets/location-pin-svgrepo-com.svg";
-import finishFlagIcon from "../assets/checkered-flag-svgrepo-com.svg";
 
 interface MapViewGoogleMapsProps {
   routePoints: RoutePoint[];
@@ -195,7 +193,7 @@ export const MapViewGoogleMaps = ({
         position: { lat: startPoint.latitude, lng: startPoint.longitude },
         map: mapInstance.current,
         icon: {
-          url: startPinIcon,
+          url: "/location-pin.svg",
           scaledSize: new google.maps.Size(40, 40),
           anchor: new google.maps.Point(20, 40),
         },
@@ -234,7 +232,7 @@ export const MapViewGoogleMaps = ({
         position: { lat: endPoint.latitude, lng: endPoint.longitude },
         map: mapInstance.current,
         icon: {
-          url: finishFlagIcon,
+          url: "/checkered-flag.svg",
           scaledSize: new google.maps.Size(40, 40),
           anchor: new google.maps.Point(5, 35),
         },
