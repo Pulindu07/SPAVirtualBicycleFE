@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MapView } from "../components/MapView";
+import { MapViewGoogleMaps as MapView } from "../components/MapViewGoogleMaps";
 import { StatsCard } from "../components/StatsCard";
 import { useUserProgress } from "../hooks/useUserProgress";
 import { useRouteData } from "../hooks/useRouteData";
@@ -129,6 +129,14 @@ export const Dashboard = () => {
               color="#667eea"
             />
             <StatsCard
+              title="Remaining Distance"
+              value={`${formatDistance(
+                routeLength - progress.totalDistanceKm
+              )} km`}
+              icon="🗺️"
+              color="#38B2AC"
+            />
+            <StatsCard
               title="Total Time"
               value={formatTime(progress.totalMovingTimeSec)}
               icon="⏱️"
@@ -161,6 +169,7 @@ export const Dashboard = () => {
               lng: progress.currentLng,
             }}
             progressPercent={progress.progressPercent}
+            coveredDistanceKm={progress.totalDistanceKm}
           />
         </div>
       </div>
