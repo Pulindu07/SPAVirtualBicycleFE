@@ -72,7 +72,7 @@ export const Dashboard = () => {
   if (progressLoading || routeLoading) {
     return (
       <div className="dashboard-container">
-        <div className="loading-spinner">Loading...</div>
+        <div className="loading-text">Loading...</div>
       </div>
     );
   }

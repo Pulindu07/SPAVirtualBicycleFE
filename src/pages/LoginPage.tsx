@@ -27,7 +27,8 @@ export const LoginPage = () => {
         <div className="login-header">
           <h1>🚴 Virtual Sri Lanka Ride Tracker</h1>
           <p className="subtitle">
-            Track your cycling journey around the beautiful coast of Sri Lanka
+            Cycle virtually from Dondra Head to Point Pedro - 572 km through Sri
+            Lanka
           </p>
         </div>
 
@@ -60,7 +61,11 @@ export const LoginPage = () => {
             </div>
             <div className="feature-item">
               <span className="feature-icon">🏝️</span>
-              <span>Explore Sri Lanka's 1,585 km coastal route</span>
+              <span>Journey 572 km from Dondra Head to Point Pedro</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">👥</span>
+              <span>Group activities now available</span>
             </div>
           </div>
 
