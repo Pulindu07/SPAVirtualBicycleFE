@@ -17,21 +17,30 @@ export const MapViewGoogleMaps = ({
   const mapInstance = useRef<google.maps.Map | null>(null);
   const routePolylineRef = useRef<google.maps.Polyline | null>(null);
   const completedPolylineRef = useRef<google.maps.Polyline | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
-  const startFinishMarkerRef = useRef<google.maps.Marker | null>(null);
-  const endMarkerRef = useRef<google.maps.Marker | null>(null);
+  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(
+    null
+  );
+  const startFinishMarkerRef =
+    useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const endMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(
+    null
+  );
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // Initialize map
   useEffect(() => {
     if (!mapRef.current) return;
 
-    const initMap = () => {
+    const initMap = async () => {
       if (mapInstance.current) return;
+
+      // Ensure AdvancedMarkerElement library is loaded
+      await google.maps.importLibrary("marker");
 
       mapInstance.current = new window.google.maps.Map(mapRef.current!, {
         center: { lat: 7.8731, lng: 80.7718 }, // Center on Sri Lanka
         zoom: 8,
+        mapId: "USER_PROGRESS_MAP_ID",
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         mapTypeControl: true,
         mapTypeControlOptions: {
@@ -184,20 +193,21 @@ export const MapViewGoogleMaps = ({
     if (routePoints.length > 0) {
       const startPoint = routePoints[0];
       if (startFinishMarkerRef.current) {
-        startFinishMarkerRef.current.setMap(null);
+        startFinishMarkerRef.current.map = null;
       }
 
-      startFinishMarkerRef.current = new window.google.maps.Marker({
-        position: { lat: startPoint.latitude, lng: startPoint.longitude },
-        map: mapInstance.current,
-        icon: {
-          url: "/location-pin.svg",
-          scaledSize: new google.maps.Size(40, 40),
-          anchor: new google.maps.Point(20, 40),
-        },
-        title: "Start: Dondra Head",
-        zIndex: 1000,
-      });
+      const startPinElement = document.createElement("div");
+      startPinElement.innerHTML = "📍";
+      startPinElement.style.fontSize = "30px";
+      startPinElement.style.textAlign = "center";
+
+      startFinishMarkerRef.current =
+        new google.maps.marker.AdvancedMarkerElement({
+          position: { lat: startPoint.latitude, lng: startPoint.longitude },
+          map: mapInstance.current,
+          content: startPinElement,
+          title: "Start: Dondra Head",
+        });
 
       // Add info window on click
       const startInfoWindow = new google.maps.InfoWindow({
@@ -210,10 +220,10 @@ export const MapViewGoogleMaps = ({
         </div>`,
       });
 
-      startFinishMarkerRef.current.addListener("click", () => {
+      startPinElement.addEventListener("click", () => {
         startInfoWindow.open(mapInstance.current, startFinishMarkerRef.current);
         mapInstance.current?.setCenter(
-          startFinishMarkerRef.current!.getPosition()!
+          startFinishMarkerRef.current!.position as google.maps.LatLng
         );
         mapInstance.current?.setZoom(12);
       });
@@ -223,19 +233,19 @@ export const MapViewGoogleMaps = ({
     if (routePoints.length > 1) {
       const endPoint = routePoints[routePoints.length - 1];
       if (endMarkerRef.current) {
-        endMarkerRef.current.setMap(null);
+        endMarkerRef.current.map = null;
       }
 
-      endMarkerRef.current = new window.google.maps.Marker({
+      const endPinElement = document.createElement("div");
+      endPinElement.innerHTML = "🏁";
+      endPinElement.style.fontSize = "30px";
+      endPinElement.style.textAlign = "center";
+
+      endMarkerRef.current = new google.maps.marker.AdvancedMarkerElement({
         position: { lat: endPoint.latitude, lng: endPoint.longitude },
         map: mapInstance.current,
-        icon: {
-          url: "/checkered-flag.svg",
-          scaledSize: new google.maps.Size(40, 40),
-          anchor: new google.maps.Point(5, 35),
-        },
+        content: endPinElement,
         title: "Finish: Point Pedro",
-        zIndex: 1000,
       });
 
       // Add info window on click
@@ -249,9 +259,11 @@ export const MapViewGoogleMaps = ({
         </div>`,
       });
 
-      endMarkerRef.current.addListener("click", () => {
+      endPinElement.addEventListener("click", () => {
         endInfoWindow.open(mapInstance.current, endMarkerRef.current);
-        mapInstance.current?.setCenter(endMarkerRef.current!.getPosition()!);
+        mapInstance.current?.setCenter(
+          endMarkerRef.current!.position as google.maps.LatLng
+        );
         mapInstance.current?.setZoom(12);
       });
     }
@@ -337,28 +349,21 @@ export const MapViewGoogleMaps = ({
 
     // Remove existing marker
     if (markerRef.current) {
-      markerRef.current.setMap(null);
+      markerRef.current.map = null;
     }
 
     // Create cyclist marker at the accurately calculated position
-    markerRef.current = new window.google.maps.Marker({
+    const cyclistPinElement = document.createElement("div");
+    cyclistPinElement.innerHTML = "🚴";
+    cyclistPinElement.style.fontSize = "30px";
+    cyclistPinElement.style.textAlign = "center";
+    cyclistPinElement.style.lineHeight = "1";
+
+    markerRef.current = new google.maps.marker.AdvancedMarkerElement({
       position: calculatedPosition,
       map: mapInstance.current,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 15,
-        fillColor: "#667eea",
-        fillOpacity: 1,
-        strokeColor: "#FFFFFF",
-        strokeWeight: 3,
-      },
+      content: cyclistPinElement,
       title: "Your Current Position",
-      label: {
-        text: "🚴",
-        fontSize: "20px",
-        color: "#FFFFFF",
-      },
-      zIndex: 2000,
     });
 
     // Add info window with progress details
@@ -371,7 +376,7 @@ export const MapViewGoogleMaps = ({
       </div>`,
     });
 
-    markerRef.current.addListener("click", () => {
+    cyclistPinElement.addEventListener("click", () => {
       infoWindow.open(mapInstance.current, markerRef.current);
     });
 

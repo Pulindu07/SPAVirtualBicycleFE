@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MapViewGoogleMaps as MapView } from "../components/MapViewGoogleMaps";
 import { StatsCard } from "../components/StatsCard";
+import { Navigation } from "../components/Navigation";
 import { useUserProgress } from "../hooks/useUserProgress";
 import { useRouteData } from "../hooks/useRouteData";
+import { useChallenges } from "../hooks/useChallenges";
+import { useGroups } from "../hooks/useGroups";
+import { useAuth } from "../hooks/useAuth";
 import { api } from "../api/client";
 import "./Dashboard.css";
 
@@ -13,6 +17,7 @@ export const Dashboard = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [syncing, setSyncing] = useState(false);
 
+  const { isSuperAdmin } = useAuth(userId);
   const {
     progress,
     loading: progressLoading,
@@ -20,6 +25,8 @@ export const Dashboard = () => {
     refetch,
   } = useUserProgress(userId);
   const { routePoints, routeLength, loading: routeLoading } = useRouteData();
+  const { challenges, loading: challengesLoading } = useChallenges(userId);
+  const { groups, loading: groupsLoading } = useGroups(userId);
 
   useEffect(() => {
     // Get userId from URL or localStorage
@@ -72,6 +79,11 @@ export const Dashboard = () => {
   if (progressLoading || routeLoading) {
     return (
       <div className="dashboard-container">
+        <Navigation
+          userId={userId}
+          isSuperAdmin={isSuperAdmin}
+          onLogout={handleLogout}
+        />
         <div className="loading-text">Loading...</div>
       </div>
     );
@@ -80,6 +92,11 @@ export const Dashboard = () => {
   if (progressError) {
     return (
       <div className="dashboard-container">
+        <Navigation
+          userId={userId}
+          isSuperAdmin={isSuperAdmin}
+          onLogout={handleLogout}
+        />
         <div className="error-container">
           <p>Error loading progress data</p>
           <button onClick={() => navigate("/")}>Back to Login</button>
@@ -94,25 +111,18 @@ export const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1>🚴 Virtual Sri Lanka Ride</h1>
-          <div className="header-actions">
-            <button
-              className="sync-btn"
-              onClick={handleSync}
-              disabled={syncing}
-            >
-              {syncing ? "🔄 Syncing..." : "🔄 Sync Now"}
-            </button>
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
+      <Navigation
+        userId={userId}
+        isSuperAdmin={isSuperAdmin}
+        onLogout={handleLogout}
+      />
       <div className="dashboard-content">
+        <div className="dashboard-header-section">
+          <h1>🚴 Virtual Sri Lanka Ride</h1>
+          <button className="sync-btn" onClick={handleSync} disabled={syncing}>
+            {syncing ? "🔄 Syncing..." : "🔄 Sync Now"}
+          </button>
+        </div>
         <div className="stats-section">
           <h2 style={{ fontSize: "28px", marginBottom: "30px" }}>
             Welcome,{" "}
@@ -131,7 +141,7 @@ export const Dashboard = () => {
             <StatsCard
               title="Remaining Distance"
               value={`${formatDistance(
-                routeLength - progress.totalDistanceKm
+                Math.max(0, routeLength - progress.totalDistanceKm)
               )} km`}
               icon="🗺️"
               color="#38B2AC"
@@ -167,6 +177,76 @@ export const Dashboard = () => {
             progressPercent={progress.progressPercent}
             coveredDistanceKm={progress.totalDistanceKm}
           />
+        </div>
+
+        <div className="challenges-section">
+          <div className="section-header">
+            <h2>Your Challenges</h2>
+            <button
+              className="btn-link"
+              onClick={() => navigate("/challenges")}
+            >
+              View All →
+            </button>
+          </div>
+          {challengesLoading ? (
+            <div className="loading-text">Loading challenges...</div>
+          ) : challenges.length === 0 ? (
+            <div className="empty-state">
+              No challenges yet.{" "}
+              <button
+                className="btn-link"
+                onClick={() => navigate("/challenges")}
+              >
+                Browse challenges
+              </button>
+            </div>
+          ) : (
+            <div className="challenges-preview">
+              {challenges.slice(0, 3).map((challenge) => (
+                <div
+                  key={challenge.id}
+                  className="challenge-preview-card"
+                  onClick={() => navigate(`/challenges/${challenge.id}`)}
+                >
+                  <h3>{challenge.name}</h3>
+                  <p>{challenge.progressPercentage.toFixed(1)}% complete</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="groups-section">
+          <div className="section-header">
+            <h2>Your Groups</h2>
+            <button className="btn-link" onClick={() => navigate("/groups")}>
+              View All →
+            </button>
+          </div>
+          {groupsLoading ? (
+            <div className="loading-text">Loading groups...</div>
+          ) : groups.length === 0 ? (
+            <div className="empty-state">
+              No groups yet.{" "}
+              <button className="btn-link" onClick={() => navigate("/groups")}>
+                Browse groups
+              </button>
+            </div>
+          ) : (
+            <div className="groups-preview">
+              {groups.slice(0, 3).map((group) => (
+                <div
+                  key={group.id}
+                  className="group-preview-card"
+                  onClick={() => navigate(`/groups/${group.id}`)}
+                >
+                  <h3>{group.name}</h3>
+                  <p>{group.memberCount} members</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
