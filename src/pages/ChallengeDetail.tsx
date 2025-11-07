@@ -31,7 +31,7 @@ export const ChallengeDetail = () => {
     leaderboard: interGroupLeaderboard,
     loading: interGroupLoading,
     refetch: refetchInterGroup,
-  } = useInterGroupLeaderboard(challengeId);
+  } = useInterGroupLeaderboard(challengeId, userId || undefined);
   const [syncing, setSyncing] = useState(false);
   const [routePoints, setRoutePoints] = useState<RoutePoint[]>([]);
   const [routeLoading, setRouteLoading] = useState(true);
@@ -205,65 +205,134 @@ export const ChallengeDetail = () => {
             <div className="info-label">Type</div>
             <div className="info-value">
               {challenge.challengeType === "individual"
-                ? "Individual"
+                ? "🏃 Individual"
                 : challenge.challengeType === "group"
-                ? "Group"
-                : "Inter-Group"}
+                ? "👥 Group"
+                : "🏆 Inter-Group"}
             </div>
           </div>
           <div className="info-card">
             <div className="info-label">Target Distance</div>
-            <div className="info-value">{challenge.targetDistanceKm} km</div>
+            <div className="info-value">
+              📍 {challenge.targetDistanceKm.toFixed(2)} km
+            </div>
           </div>
           <div className="info-card">
             <div className="info-label">Progress</div>
             <div className="info-value">
-              {challenge.progressPercentage.toFixed(1)}%
+              📊 {Math.min(challenge.progressPercentage, 100).toFixed(1)}%
             </div>
           </div>
           <div className="info-card">
-            <div className="info-label">Participants</div>
-            <div className="info-value">{challenge.participantCount}</div>
+            <div className="info-label">
+              {challenge.challengeType === "inter-group"
+                ? "Groups"
+                : "Participants"}
+            </div>
+            <div className="info-value">
+              {challenge.challengeType === "inter-group" ? "👥" : "👤"}{" "}
+              {challenge.challengeType === "inter-group"
+                ? challenge.groupCount
+                : challenge.participantCount}
+            </div>
           </div>
           <div className="info-card">
             <div className="info-label">Start Date</div>
             <div className="info-value">
-              {new Date(challenge.startDate).toLocaleDateString()}
+              🗓️ {new Date(challenge.startDate).toLocaleDateString()}
             </div>
           </div>
           <div className="info-card">
             <div className="info-label">End Date</div>
             <div className="info-value">
-              {new Date(challenge.endDate).toLocaleDateString()}
+              🏁 {new Date(challenge.endDate).toLocaleDateString()}
             </div>
           </div>
         </div>
 
         {challenge.challengeType === "inter-group" ? (
-          <div className="leaderboard-section">
-            <h2>Group Rankings</h2>
-            {interGroupLoading ? (
-              <div className="loading">Loading leaderboard...</div>
-            ) : interGroupLeaderboard ? (
-              <div className="leaderboard">
-                {interGroupLeaderboard.groupRankings.map((group, index) => (
-                  <div key={group.groupId} className="leaderboard-entry">
-                    <div className="rank">#{index + 1}</div>
-                    <div className="entry-info">
-                      <div className="entry-name">{group.groupName}</div>
-                      <div className="entry-stats">
-                        <span>{group.totalDistanceCovered.toFixed(2)} km</span>
-                        <span>{group.progressPercentage.toFixed(1)}%</span>
-                        <span>{group.memberCount} members</span>
+          <>
+            <div className="leaderboard-section">
+              <h2>Group Rankings</h2>
+              {interGroupLoading ? (
+                <div className="loading">Loading leaderboard...</div>
+              ) : interGroupLeaderboard ? (
+                <div className="leaderboard">
+                  {interGroupLeaderboard.groupRankings.map((group) => (
+                    <div key={group.groupId} className="leaderboard-entry">
+                      <div className="rank">👥 #{group.rank}</div>
+                      <div className="entry-info">
+                        <div className="entry-name">{group.groupName}</div>
+                        <div className="entry-stats">
+                          <span>
+                            📍 {group.totalDistanceCovered.toFixed(2)} km
+                          </span>
+                          <span>
+                            📊{" "}
+                            {Math.min(group.progressPercentage, 100).toFixed(1)}
+                            %
+                          </span>
+                          <span>👤 {group.memberCount} members</span>
+                        </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state">No group rankings available</div>
+              )}
+            </div>
+
+            {interGroupLeaderboard?.userGroupMemberRankings &&
+              interGroupLeaderboard.userGroupMemberRankings.length > 0 && (
+                <div className="leaderboard-section">
+                  <h2>
+                    Group Progress
+                    {interGroupLeaderboard.userGroupName && (
+                      <span
+                        style={{ fontWeight: "normal", fontSize: "0.85rem" }}
+                      >
+                        {" "}
+                        ({interGroupLeaderboard.userGroupName})
+                      </span>
+                    )}
+                  </h2>
+                  <div className="leaderboard">
+                    {interGroupLeaderboard.userGroupMemberRankings.map(
+                      (entry) => (
+                        <div
+                          key={entry.userId}
+                          className={`leaderboard-entry ${
+                            entry.isCurrentUser ? "current-user" : ""
+                          }`}
+                        >
+                          <div className="rank">👤 #{entry.rank}</div>
+                          <div className="entry-info">
+                            <div className="entry-name">
+                              {entry.firstName} {entry.lastName}{" "}
+                              {entry.isCurrentUser && "(You)"}
+                            </div>
+                            <div className="entry-stats">
+                              <span>
+                                📍 {entry.distanceCoveredKm.toFixed(2)} km
+                              </span>
+                              <span>
+                                📊{" "}
+                                {Math.min(
+                                  entry.progressPercentage,
+                                  100
+                                ).toFixed(1)}
+                                %
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    )}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">No group rankings available</div>
-            )}
-          </div>
+                </div>
+              )}
+          </>
         ) : (
           <div className="leaderboard-section">
             <h2>Leaderboard</h2>
@@ -278,15 +347,18 @@ export const ChallengeDetail = () => {
                       entry.isCurrentUser ? "current-user" : ""
                     }`}
                   >
-                    <div className="rank">#{entry.rank}</div>
+                    <div className="rank">👤 #{entry.rank}</div>
                     <div className="entry-info">
                       <div className="entry-name">
                         {entry.firstName} {entry.lastName}{" "}
                         {entry.isCurrentUser && "(You)"}
                       </div>
                       <div className="entry-stats">
-                        <span>{entry.distanceCoveredKm.toFixed(2)} km</span>
-                        <span>{entry.progressPercentage.toFixed(1)}%</span>
+                        <span>📍 {entry.distanceCoveredKm.toFixed(2)} km</span>
+                        <span>
+                          📊{" "}
+                          {Math.min(entry.progressPercentage, 100).toFixed(1)}%
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -298,25 +370,42 @@ export const ChallengeDetail = () => {
           </div>
         )}
 
-        {/* Challenge Map - Show all participants */}
-        {challenge.challengeType !== "inter-group" &&
+        {/* Challenge Map - Show participants or groups */}
+        {((challenge.challengeType !== "inter-group" &&
           leaderboard &&
-          leaderboard.entries.length > 0 && (
-            <div className="challenge-map-section">
-              <h2>Participants on Map</h2>
-              {routeLoading ? (
-                <div className="loading">Loading map...</div>
-              ) : routePoints.length > 0 ? (
+          leaderboard.entries.length > 0) ||
+          (challenge.challengeType === "inter-group" &&
+            interGroupLeaderboard &&
+            interGroupLeaderboard.groupRankings.length > 0 &&
+            routePoints.length > 0)) && (
+          <div className="challenge-map-section">
+            <h2>
+              {challenge.challengeType === "inter-group"
+                ? "Groups on Map"
+                : "Participants on Map"}
+            </h2>
+            {routeLoading || interGroupLoading ? (
+              <div className="loading">Loading map...</div>
+            ) : routePoints.length > 0 ? (
+              challenge.challengeType === "inter-group" ? (
                 <ChallengeMapView
                   routePoints={routePoints}
-                  leaderboardEntries={leaderboard.entries}
+                  leaderboardEntries={[]}
                   challengeRouteId={challenge.routeId}
+                  groupRankings={interGroupLeaderboard?.groupRankings || []}
                 />
               ) : (
-                <div className="empty-state">No route data available</div>
-              )}
-            </div>
-          )}
+                <ChallengeMapView
+                  routePoints={routePoints}
+                  leaderboardEntries={leaderboard?.entries || []}
+                  challengeRouteId={challenge.routeId}
+                />
+              )
+            ) : (
+              <div className="empty-state">No route data available</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

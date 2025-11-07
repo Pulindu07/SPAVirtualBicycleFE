@@ -84,6 +84,8 @@ export interface ChallengeGroup {
   progressPercentage: number;
   memberCount: number;
   rank: number;
+  currentPositionLat?: number; // For map display
+  currentPositionLng?: number; // For map display
 }
 
 export interface Challenge {
@@ -100,6 +102,7 @@ export interface Challenge {
   createdByUsername: string;
   createdAt: string;
   participantCount: number;
+  groupCount: number; // Number of participating groups (for inter-group challenges)
   totalDistanceCovered: number;
   progressPercentage: number;
   status: string; // "upcoming", "in_progress", "completed"
@@ -173,6 +176,9 @@ export interface InterGroupLeaderboard {
   challengeName: string;
   targetDistanceKm: number;
   groupRankings: ChallengeGroup[];
+  userGroupMemberRankings?: LeaderboardEntry[]; // Within user's group
+  userGroupId?: number;
+  userGroupName?: string;
 }
 
 // Route Generation types

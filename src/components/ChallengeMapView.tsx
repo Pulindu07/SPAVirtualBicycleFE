@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import type { RoutePoint, LeaderboardEntry } from "../types";
+import type { RoutePoint, LeaderboardEntry, ChallengeGroup } from "../types";
 import "./MapViewGoogleMaps.css";
 
 interface ChallengeMapViewProps {
   routePoints: RoutePoint[];
   leaderboardEntries: LeaderboardEntry[];
   challengeRouteId?: number;
+  groupRankings?: ChallengeGroup[]; // For inter-group challenges
 }
 
 export const ChallengeMapView = ({
   routePoints,
   leaderboardEntries,
+  groupRankings,
 }: ChallengeMapViewProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
@@ -135,9 +137,13 @@ export const ChallengeMapView = ({
     });
   }, [mapLoaded, routePoints]);
 
-  // Update participant markers
+  // Update participant/group markers
   useEffect(() => {
-    if (!mapLoaded || !mapInstance.current || routePoints.length === 0 || leaderboardEntries.length === 0) return;
+    if (!mapLoaded || !mapInstance.current || routePoints.length === 0) return;
+    
+    // For inter-group challenges, check groupRankings; for others, check leaderboardEntries
+    if (!groupRankings && leaderboardEntries.length === 0) return;
+    if (groupRankings && groupRankings.length === 0) return;
 
     // Calculate cumulative distances for interpolation
     const calculateDistance = (
@@ -178,67 +184,161 @@ export const ChallengeMapView = ({
     });
     markersRef.current.clear();
 
-    // Create markers for each participant
-    leaderboardEntries.forEach((entry) => {
-      if (!entry.currentPositionLat || !entry.currentPositionLng) return;
+    // If groupRankings is provided, show group markers (for inter-group challenges)
+    if (groupRankings && groupRankings.length > 0) {
+      console.log(`Displaying ${groupRankings.length} groups on map:`, groupRankings.map(g => ({
+        name: g.groupName,
+        distance: g.totalDistanceCovered,
+        position: g.currentPositionLat && g.currentPositionLng ? `${g.currentPositionLat}, ${g.currentPositionLng}` : 'MISSING'
+      })));
+      
+      const bounds = new window.google.maps.LatLngBounds();
+      let hasValidMarkers = false;
 
-      const position = {
-        lat: entry.currentPositionLat,
-        lng: entry.currentPositionLng,
-      };
+      groupRankings.forEach((group) => {
+        if (!group.currentPositionLat || !group.currentPositionLng) {
+          console.warn(`Group ${group.groupName} (ID: ${group.groupId}) missing position data. Total distance: ${group.totalDistanceCovered.toFixed(2)} km`);
+          return;
+        }
 
-      const pinElement = document.createElement("div");
-      pinElement.style.display = "flex";
-      pinElement.style.flexDirection = "column";
-      pinElement.style.alignItems = "center";
-      pinElement.style.gap = "2px";
+        const position = {
+          lat: group.currentPositionLat,
+          lng: group.currentPositionLng,
+        };
 
-      const emoji = document.createElement("div");
-      emoji.innerHTML = entry.isCurrentUser ? "🚴" : "👤";
-      emoji.style.fontSize = "24px";
-      emoji.style.lineHeight = "1";
+        bounds.extend(position);
+        hasValidMarkers = true;
 
-      const label = document.createElement("div");
-      label.textContent = `#${entry.rank}`;
-      label.style.fontSize = "10px";
-      label.style.fontWeight = "bold";
-      label.style.color = entry.isCurrentUser ? "#667eea" : "#666";
-      label.style.backgroundColor = "white";
-      label.style.padding = "2px 4px";
-      label.style.borderRadius = "3px";
-      label.style.boxShadow = "0 1px 3px rgba(0,0,0,0.3)";
+        const pinElement = document.createElement("div");
+        pinElement.style.display = "flex";
+        pinElement.style.flexDirection = "column";
+        pinElement.style.alignItems = "center";
+        pinElement.style.gap = "2px";
 
-      pinElement.appendChild(emoji);
-      pinElement.appendChild(label);
+        const emoji = document.createElement("div");
+        emoji.innerHTML = "👥";
+        emoji.style.fontSize = "28px";
+        emoji.style.lineHeight = "1";
 
-      const marker = new google.maps.marker.AdvancedMarkerElement({
-        position: position,
-        map: mapInstance.current,
-        content: pinElement,
-        title: `${entry.firstName} ${entry.lastName} - ${entry.distanceCoveredKm.toFixed(2)} km`,
+        const label = document.createElement("div");
+        label.textContent = `#${group.rank}`;
+        label.style.fontSize = "11px";
+        label.style.fontWeight = "bold";
+        label.style.color = "#667eea";
+        label.style.backgroundColor = "white";
+        label.style.padding = "3px 6px";
+        label.style.borderRadius = "4px";
+        label.style.boxShadow = "0 2px 4px rgba(0,0,0,0.3)";
+
+        pinElement.appendChild(emoji);
+        pinElement.appendChild(label);
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          position: position,
+          map: mapInstance.current,
+          content: pinElement,
+          title: `${group.groupName} - ${group.totalDistanceCovered.toFixed(2)} km`,
+        });
+
+        // Add info window
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<div style="padding: 8px;">
+            <strong style="color: #667eea; font-size: 16px;">
+              👥 Group #${group.rank}
+            </strong><br/>
+            <strong>${group.groupName}</strong><br/>
+            Total Distance: <strong>${group.totalDistanceCovered.toFixed(2)} km</strong><br/>
+            Progress: <strong>${Math.min(group.progressPercentage, 100).toFixed(1)}%</strong><br/>
+            Members: <strong>${group.memberCount}</strong><br/>
+            Lat: ${position.lat.toFixed(4)}<br/>
+            Lng: ${position.lng.toFixed(4)}
+          </div>`,
+        });
+
+        pinElement.addEventListener("click", () => {
+          infoWindow.open(mapInstance.current, marker);
+        });
+
+        markersRef.current.set(group.groupId, marker);
       });
 
-      // Add info window
-      const infoWindow = new google.maps.InfoWindow({
-        content: `<div style="padding: 8px;">
-          <strong style="color: ${entry.isCurrentUser ? "#667eea" : "#333"}; font-size: 16px;">
-            ${entry.isCurrentUser ? "🚴 You" : "👤"} #${entry.rank}
-          </strong><br/>
-          <strong>${entry.firstName} ${entry.lastName}</strong><br/>
-          Distance: <strong>${entry.distanceCoveredKm.toFixed(2)} km</strong><br/>
-          Progress: <strong>${entry.progressPercentage.toFixed(1)}%</strong><br/>
-          Lat: ${position.lat.toFixed(4)}<br/>
-          Lng: ${position.lng.toFixed(4)}
-        </div>`,
-      });
+      // Fit map bounds to show all groups and route
+      if (hasValidMarkers) {
+        // Include route points in bounds
+        routePoints.forEach((point) => {
+          bounds.extend({ lat: point.latitude, lng: point.longitude });
+        });
+        
+        mapInstance.current.fitBounds(bounds, {
+          top: 50,
+          bottom: 50,
+          left: 50,
+          right: 50,
+        });
+      }
+    } else {
+      // Create markers for each participant (for individual/group challenges)
+      leaderboardEntries.forEach((entry) => {
+        if (!entry.currentPositionLat || !entry.currentPositionLng) return;
 
-      pinElement.addEventListener("click", () => {
-        infoWindow.open(mapInstance.current, marker);
-      });
+        const position = {
+          lat: entry.currentPositionLat,
+          lng: entry.currentPositionLng,
+        };
 
-      markersRef.current.set(entry.userId, marker);
-    });
-  }, [mapLoaded, routePoints, leaderboardEntries]);
+        const pinElement = document.createElement("div");
+        pinElement.style.display = "flex";
+        pinElement.style.flexDirection = "column";
+        pinElement.style.alignItems = "center";
+        pinElement.style.gap = "2px";
+
+        const emoji = document.createElement("div");
+        emoji.innerHTML = entry.isCurrentUser ? "🚴" : "👤";
+        emoji.style.fontSize = "24px";
+        emoji.style.lineHeight = "1";
+
+        const label = document.createElement("div");
+        label.textContent = `#${entry.rank}`;
+        label.style.fontSize = "10px";
+        label.style.fontWeight = "bold";
+        label.style.color = entry.isCurrentUser ? "#667eea" : "#666";
+        label.style.backgroundColor = "white";
+        label.style.padding = "2px 4px";
+        label.style.borderRadius = "3px";
+        label.style.boxShadow = "0 1px 3px rgba(0,0,0,0.3)";
+
+        pinElement.appendChild(emoji);
+        pinElement.appendChild(label);
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          position: position,
+          map: mapInstance.current,
+          content: pinElement,
+          title: `${entry.firstName} ${entry.lastName} - ${entry.distanceCoveredKm.toFixed(2)} km`,
+        });
+
+        // Add info window
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<div style="padding: 8px;">
+            <strong style="color: ${entry.isCurrentUser ? "#667eea" : "#333"}; font-size: 16px;">
+              ${entry.isCurrentUser ? "🚴 You" : "👤"} #${entry.rank}
+            </strong><br/>
+            <strong>${entry.firstName} ${entry.lastName}</strong><br/>
+            Distance: <strong>${entry.distanceCoveredKm.toFixed(2)} km</strong><br/>
+            Progress: <strong>${entry.progressPercentage.toFixed(1)}%</strong><br/>
+            Lat: ${position.lat.toFixed(4)}<br/>
+            Lng: ${position.lng.toFixed(4)}
+          </div>`,
+        });
+
+        pinElement.addEventListener("click", () => {
+          infoWindow.open(mapInstance.current, marker);
+        });
+
+        markersRef.current.set(entry.userId, marker);
+      });
+    }
+  }, [mapLoaded, routePoints, leaderboardEntries, groupRankings]);
 
   return (
     <div className="map-container-google">
