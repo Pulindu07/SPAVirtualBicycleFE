@@ -113,7 +113,10 @@ export const useChallengeLeaderboard = (
   return { leaderboard, loading, error, refetch };
 };
 
-export const useInterGroupLeaderboard = (challengeId: number | null) => {
+export const useInterGroupLeaderboard = (
+  challengeId: number | null,
+  userId?: number
+) => {
   const [leaderboard, setLeaderboard] = useState<InterGroupLeaderboard | null>(
     null
   );
@@ -129,7 +132,7 @@ export const useInterGroupLeaderboard = (challengeId: number | null) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await api.getInterGroupLeaderboard(challengeId);
+      const data = await api.getInterGroupLeaderboard(challengeId, userId);
       setLeaderboard(data);
     } catch (err) {
       setError("Failed to fetch inter-group leaderboard");
@@ -141,7 +144,7 @@ export const useInterGroupLeaderboard = (challengeId: number | null) => {
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [challengeId]);
+  }, [challengeId, userId]);
 
   const refetch = () => {
     fetchLeaderboard();

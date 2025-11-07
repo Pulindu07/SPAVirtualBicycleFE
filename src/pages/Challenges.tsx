@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useChallenges } from "../hooks/useChallenges";
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../api/client";
 import { Navigation } from "../components/Navigation";
-import type { CreateChallengeDto } from "../types";
+import type { CreateChallengeDto, Group, Route } from "../types";
 import "./Challenges.css";
 
 export const Challenges = () => {
@@ -14,6 +14,10 @@ export const Challenges = () => {
   const { challenges, loading, error, refetch } = useChallenges(userId);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [routes, setRoutes] = useState<Route[]>([]);
+  const [loadingGroups, setLoadingGroups] = useState(false);
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
 
   const [formData, setFormData] = useState<CreateChallengeDto>({
     name: "",
@@ -28,9 +32,87 @@ export const Challenges = () => {
     routeId: undefined,
   });
 
+  // Fetch groups when challenge type is group or inter-group
+  useEffect(() => {
+    const fetchGroups = async () => {
+      if (
+        userId &&
+        isSuperAdmin &&
+        (formData.challengeType === "group" ||
+          formData.challengeType === "inter-group")
+      ) {
+        try {
+          setLoadingGroups(true);
+          const allGroups = await api.getAllGroups(userId);
+          setGroups(allGroups);
+        } catch (error) {
+          console.error("Failed to fetch groups:", error);
+          setGroups([]);
+        } finally {
+          setLoadingGroups(false);
+        }
+      } else {
+        setGroups([]);
+      }
+    };
+
+    fetchGroups();
+  }, [formData.challengeType, userId, isSuperAdmin]);
+
+  // Fetch routes on component mount
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        setLoadingRoutes(true);
+        const allRoutes = await api.getRoutes();
+        setRoutes(allRoutes);
+      } catch (error) {
+        console.error("Failed to fetch routes:", error);
+        setRoutes([]);
+      } finally {
+        setLoadingRoutes(false);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("userId");
     navigate("/");
+  };
+
+  const handleRouteChange = (routeId: number | undefined) => {
+    if (routeId) {
+      const selectedRoute = routes.find((r) => r.id === routeId);
+      if (selectedRoute) {
+        setFormData({
+          ...formData,
+          routeId: routeId,
+          targetDistanceKm: selectedRoute.totalDistanceKm,
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        routeId: undefined,
+      });
+    }
+  };
+
+  const handleGroupToggle = (groupId: number) => {
+    const currentGroupIds = formData.groupIds || [];
+    if (currentGroupIds.includes(groupId)) {
+      setFormData({
+        ...formData,
+        groupIds: currentGroupIds.filter((id) => id !== groupId),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        groupIds: [...currentGroupIds, groupId],
+      });
+    }
   };
 
   const handleCreateChallenge = async (e: React.FormEvent) => {
@@ -125,36 +207,73 @@ export const Challenges = () => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Target Distance (km) *</label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={formData.targetDistanceKm}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        targetDistanceKm: parseFloat(e.target.value),
-                      })
-                    }
-                  />
-                </div>
-                <div className="form-group">
                   <label>Challenge Type *</label>
                   <select
                     required
                     value={formData.challengeType}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const newType = e.target.value;
                       setFormData({
                         ...formData,
-                        challengeType: e.target.value,
-                      })
-                    }
+                        challengeType: newType,
+                        groupIds: newType === "individual" ? [] : formData.groupIds,
+                      });
+                    }}
                   >
                     <option value="individual">Individual</option>
                     <option value="group">Group</option>
                     <option value="inter-group">Inter-Group</option>
                   </select>
+                </div>
+                <div className="form-group">
+                  <label>Route *</label>
+                  {loadingRoutes ? (
+                    <div>Loading routes...</div>
+                  ) : (
+                    <select
+                      required
+                      value={formData.routeId || ""}
+                      onChange={(e) =>
+                        handleRouteChange(
+                          e.target.value ? parseInt(e.target.value) : undefined
+                        )
+                      }
+                    >
+                      <option value="">Select a route</option>
+                      {routes.map((route) => (
+                        <option key={route.id} value={route.id}>
+                          {route.name} ({route.totalDistanceKm.toFixed(2)} km)
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Target Distance (km) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    step="0.01"
+                    value={formData.targetDistanceKm}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        targetDistanceKm: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    readOnly={!!formData.routeId}
+                    style={{
+                      backgroundColor: formData.routeId ? "#f0f0f0" : "white",
+                    }}
+                  />
+                  {formData.routeId && (
+                    <small style={{ color: "#666", fontSize: "12px" }}>
+                      Auto-filled from selected route
+                    </small>
+                  )}
                 </div>
               </div>
               <div className="form-row">
@@ -181,21 +300,58 @@ export const Challenges = () => {
                   />
                 </div>
               </div>
-              <div className="form-group">
-                <label>Route ID (optional)</label>
-                <input
-                  type="number"
-                  value={formData.routeId || ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      routeId: e.target.value
-                        ? parseInt(e.target.value)
-                        : undefined,
-                    })
-                  }
-                />
-              </div>
+              {(formData.challengeType === "group" ||
+                formData.challengeType === "inter-group") && (
+                <div className="form-group">
+                  <label>
+                    Select Groups *{" "}
+                    {formData.challengeType === "inter-group" &&
+                      "(Select 2 or more groups)"}
+                  </label>
+                  {loadingGroups ? (
+                    <div>Loading groups...</div>
+                  ) : groups.length === 0 ? (
+                    <div style={{ color: "#999" }}>No groups available</div>
+                  ) : (
+                    <div
+                      style={{
+                        maxHeight: "200px",
+                        overflowY: "auto",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        padding: "8px",
+                      }}
+                    >
+                      {groups.map((group) => (
+                        <label
+                          key={group.id}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "8px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.groupIds?.includes(group.id) || false}
+                            onChange={() => handleGroupToggle(group.id)}
+                            style={{ marginRight: "8px" }}
+                          />
+                          <span>
+                            {group.name} ({group.memberCount} members)
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                  {formData.groupIds && formData.groupIds.length > 0 && (
+                    <small style={{ color: "#666", fontSize: "12px" }}>
+                      {formData.groupIds.length} group(s) selected
+                    </small>
+                  )}
+                </div>
+              )}
               <button type="submit" className="btn-primary" disabled={creating}>
                 {creating ? "Creating..." : "Create Challenge"}
               </button>
@@ -260,9 +416,15 @@ export const Challenges = () => {
                           </span>
                         </div>
                         <div className="stat">
-                          <span className="stat-label">Participants</span>
+                          <span className="stat-label">
+                            {challenge.challengeType === "inter-group"
+                              ? "Groups"
+                              : "Participants"}
+                          </span>
                           <span className="stat-value">
-                            {challenge.participantCount}
+                            {challenge.challengeType === "inter-group"
+                              ? challenge.groupCount
+                              : challenge.participantCount}
                           </span>
                         </div>
                       </div>

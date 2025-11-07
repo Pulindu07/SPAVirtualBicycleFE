@@ -202,10 +202,13 @@ export const api = {
   },
 
   getInterGroupLeaderboard: async (
-    challengeId: number
+    challengeId: number,
+    userId?: number
   ): Promise<InterGroupLeaderboard> => {
+    const params = userId ? { userId } : {};
     const response = await apiClient.get<InterGroupLeaderboard>(
-      `/challenge/${challengeId}/inter-group-leaderboard`
+      `/challenge/${challengeId}/inter-group-leaderboard`,
+      { params }
     );
     return response.data;
   },
@@ -226,6 +229,13 @@ export const api = {
 
   getUserGroups: async (userId: number): Promise<Group[]> => {
     const response = await apiClient.get<Group[]>(`/group/user/${userId}`);
+    return response.data;
+  },
+
+  getAllGroups: async (userId: number): Promise<Group[]> => {
+    const response = await apiClient.get<Group[]>(`/group/all`, {
+      params: { userId },
+    });
     return response.data;
   },
 
