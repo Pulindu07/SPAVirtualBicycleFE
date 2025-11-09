@@ -118,7 +118,7 @@ export const Dashboard = () => {
       />
       <div className="dashboard-content">
         <div className="dashboard-header-section">
-          <h1>🚴 Virtual Sri Lanka Ride</h1>
+          <h1>🚴 Ceylon Virtual Rides</h1>
           <button className="sync-btn" onClick={handleSync} disabled={syncing}>
             {syncing ? "🔄 Syncing..." : "🔄 Sync Now"}
           </button>

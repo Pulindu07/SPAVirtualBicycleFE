@@ -25,7 +25,7 @@ export const LoginPage = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>🚴 Virtual Sri Lanka Ride Tracker</h1>
+          <h1>🚴 Ceylon Virtual Rides</h1>
           <p className="subtitle">
             Cycle virtually from Dondra Head to Point Pedro - 572 km through Sri
             Lanka
