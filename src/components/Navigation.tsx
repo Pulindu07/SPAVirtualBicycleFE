@@ -39,7 +39,7 @@ export const Navigation = ({
               className="nav-logo"
               onClick={closeMobileMenu}
             >
-              🚴 Virtual Ride Tracker
+              🚴 Ceylon Virtual Rides
             </Link>
             <button
               className="mobile-menu-toggle"
