@@ -260,7 +260,27 @@ export const ChallengeDetail = () => {
                 <div className="leaderboard">
                   {interGroupLeaderboard.groupRankings.map((group) => (
                     <div key={group.groupId} className="leaderboard-entry">
-                      <div className="rank">👥 #{group.rank}</div>
+                      <div className="rank">
+                        {group.groupIconUrl ? (
+                          <img
+                            src={group.groupIconUrl}
+                            height={"48ox"}
+                            width={"48px"}
+                            onError={(e) => {
+                              // fallback to emoji if the image fails to load
+                              e.currentTarget.onerror = null; // prevent infinite loop
+                              e.currentTarget.style.display = "none"; // hide broken image
+                              e.currentTarget.insertAdjacentText(
+                                "afterend",
+                                "👥"
+                              );
+                            }}
+                          />
+                        ) : (
+                          "👥"
+                        )}
+                        #{group.rank}
+                      </div>
                       <div className="entry-info">
                         <div className="entry-name">{group.groupName}</div>
                         <div className="entry-stats">
