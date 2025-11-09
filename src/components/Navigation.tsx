@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./Navigation.css";
 
@@ -13,51 +14,89 @@ export const Navigation = ({
   onLogout,
 }: NavigationProps) => {
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   if (!userId) return null;
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <nav className="navigation">
-      <div className="nav-content">
-        <Link to="/dashboard" className="nav-logo">
-          🚴 Virtual Ride Tracker
-        </Link>
-        <div className="nav-links">
-          <Link
-            to="/dashboard"
-            className={location.pathname === "/dashboard" ? "active" : ""}
-          >
-            Dashboard
-          </Link>
-          <Link
-            to="/challenges"
-            className={
-              location.pathname.startsWith("/challenges") ? "active" : ""
-            }
-          >
-            Challenges
-          </Link>
-          <Link
-            to="/groups"
-            className={location.pathname.startsWith("/groups") ? "active" : ""}
-          >
-            Groups
-          </Link>
-          {isSuperAdmin && (
+    <>
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-backdrop" onClick={closeMobileMenu} />
+      )}
+      <nav className="navigation">
+        <div className="nav-content">
+          <div className="nav-header-row">
             <Link
-              to="/routes"
-              className={
-                location.pathname.startsWith("/routes") ? "active" : ""
-              }
+              to="/dashboard"
+              className="nav-logo"
+              onClick={closeMobileMenu}
             >
-              Routes
+              🚴 Virtual Ride Tracker
             </Link>
-          )}
-          <button className="nav-logout" onClick={onLogout}>
-            Logout
-          </button>
+            <button
+              className="mobile-menu-toggle"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <span className={`hamburger ${isMobileMenuOpen ? "open" : ""}`}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
+          </div>
+          <div className={`nav-links ${isMobileMenuOpen ? "open" : ""}`}>
+            <Link
+              to="/dashboard"
+              className={location.pathname === "/dashboard" ? "active" : ""}
+              onClick={closeMobileMenu}
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/challenges"
+              className={
+                location.pathname.startsWith("/challenges") ? "active" : ""
+              }
+              onClick={closeMobileMenu}
+            >
+              Challenges
+            </Link>
+            <Link
+              to="/groups"
+              className={
+                location.pathname.startsWith("/groups") ? "active" : ""
+              }
+              onClick={closeMobileMenu}
+            >
+              Groups
+            </Link>
+            {isSuperAdmin && (
+              <Link
+                to="/routes"
+                className={
+                  location.pathname.startsWith("/routes") ? "active" : ""
+                }
+                onClick={closeMobileMenu}
+              >
+                Routes
+              </Link>
+            )}
+            <button className="nav-logout" onClick={onLogout}>
+              Logout
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 };

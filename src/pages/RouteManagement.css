@@ -14,12 +14,53 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .route-management-header h1 {
   font-size: 2.5rem;
   color: #333;
   margin: 0;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .route-management-container {
+    padding: 1.5rem;
+  }
+
+  .route-management-header h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .route-management-container {
+    padding: 1rem;
+  }
+
+  .route-management-header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 1.5rem;
+  }
+
+  .route-management-header h1 {
+    font-size: 1.75rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .route-management-container {
+    padding: 0.75rem;
+  }
+
+  .route-management-header h1 {
+    font-size: 1.5rem;
+  }
 }
 
 .generate-route-form {
@@ -34,6 +75,25 @@
   margin-top: 0;
   margin-bottom: 1.5rem;
   color: #333;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .generate-route-form {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .generate-route-form h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .generate-route-form {
+    padding: 1rem;
+  }
 }
 
 .form-group {
@@ -67,10 +127,23 @@
   display: flex;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .waypoint-input input {
   flex: 1;
+  min-width: 200px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .waypoint-input {
+    flex-direction: column;
+  }
+
+  .waypoint-input input {
+    min-width: 100%;
+  }
 }
 
 .waypoints-list {
@@ -117,10 +190,44 @@
   color: #333;
 }
 
+/* Mobile */
+@media (max-width: 768px) {
+  .routes-list {
+    padding: 1.5rem;
+  }
+
+  .routes-list h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .routes-list {
+    padding: 1rem;
+  }
+}
+
 .routes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .routes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .routes-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 .route-card {
@@ -146,6 +253,13 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
   margin-bottom: 1rem;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .route-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stat {

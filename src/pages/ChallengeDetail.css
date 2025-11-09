@@ -9,6 +9,26 @@
   padding: 1rem;
 }
 
+/* Tablet */
+@media (max-width: 1024px) {
+  .challenge-detail-container {
+    padding: 1rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .challenge-detail-container {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .challenge-detail-container {
+    padding: 0.5rem;
+  }
+}
+
 .back-button {
   background: white;
   border: 2px solid #667eea;
@@ -35,12 +55,60 @@
   display: flex;
   justify-content: space-between;
   align-items: start;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .challenge-header h1 {
   margin: 0 0 0.25rem 0;
   color: #333;
   font-size: 1.5rem;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .challenge-header {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .challenge-header h1 {
+    font-size: 1.25rem;
+    width: 100%;
+  }
+
+  .challenge-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .challenge-header {
+    padding: 0.75rem;
+  }
+
+  .challenge-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .challenge-actions {
+    flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
 }
 
 .challenge-description {
@@ -101,6 +169,20 @@
   margin-bottom: 1rem;
 }
 
+/* Mobile */
+@media (max-width: 768px) {
+  .challenge-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .challenge-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .info-card {
   background: white;
   padding: 0.75rem 1rem;
@@ -142,6 +224,40 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 0.75rem;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .leaderboard {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .leaderboard-section {
+    padding: 1rem;
+  }
+
+  .leaderboard-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .leaderboard {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-section {
+    padding: 0.75rem;
+  }
+
+  .leaderboard {
+    grid-template-columns: 1fr;
+  }
 }
 
 .leaderboard-entry {
@@ -235,4 +351,22 @@
   margin-bottom: 0.75rem;
   color: #333;
   font-size: 1.25rem;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .challenge-map-section {
+    padding: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .challenge-map-section h2 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .challenge-map-section {
+    padding: 0.75rem;
+  }
 }

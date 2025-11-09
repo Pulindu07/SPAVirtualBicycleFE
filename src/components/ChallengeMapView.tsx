@@ -17,9 +17,14 @@ export const ChallengeMapView = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
   const routePolylineRef = useRef<google.maps.Polyline | null>(null);
-  const markersRef = useRef<Map<number, google.maps.marker.AdvancedMarkerElement>>(new Map());
-  const startFinishMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
-  const endMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const markersRef = useRef<
+    Map<number, google.maps.marker.AdvancedMarkerElement>
+  >(new Map());
+  const startFinishMarkerRef =
+    useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const endMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(
+    null
+  );
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // Initialize map
@@ -98,12 +103,13 @@ export const ChallengeMapView = ({
       startPinElement.style.fontSize = "30px";
       startPinElement.style.textAlign = "center";
 
-      startFinishMarkerRef.current = new google.maps.marker.AdvancedMarkerElement({
-        position: { lat: startPoint.latitude, lng: startPoint.longitude },
-        map: mapInstance.current,
-        content: startPinElement,
-        title: "Start",
-      });
+      startFinishMarkerRef.current =
+        new google.maps.marker.AdvancedMarkerElement({
+          position: { lat: startPoint.latitude, lng: startPoint.longitude },
+          map: mapInstance.current,
+          content: startPinElement,
+          title: "Start",
+        });
     }
 
     // Add End marker
@@ -140,7 +146,7 @@ export const ChallengeMapView = ({
   // Update participant/group markers
   useEffect(() => {
     if (!mapLoaded || !mapInstance.current || routePoints.length === 0) return;
-    
+
     // For inter-group challenges, check groupRankings; for others, check leaderboardEntries
     if (!groupRankings && leaderboardEntries.length === 0) return;
     if (groupRankings && groupRankings.length === 0) return;
@@ -186,18 +192,30 @@ export const ChallengeMapView = ({
 
     // If groupRankings is provided, show group markers (for inter-group challenges)
     if (groupRankings && groupRankings.length > 0) {
-      console.log(`Displaying ${groupRankings.length} groups on map:`, groupRankings.map(g => ({
-        name: g.groupName,
-        distance: g.totalDistanceCovered,
-        position: g.currentPositionLat && g.currentPositionLng ? `${g.currentPositionLat}, ${g.currentPositionLng}` : 'MISSING'
-      })));
-      
+      console.log(
+        `Displaying ${groupRankings.length} groups on map:`,
+        groupRankings.map((g) => ({
+          name: g.groupName,
+          distance: g.totalDistanceCovered,
+          position:
+            g.currentPositionLat && g.currentPositionLng
+              ? `${g.currentPositionLat}, ${g.currentPositionLng}`
+              : "MISSING",
+        }))
+      );
+
       const bounds = new window.google.maps.LatLngBounds();
       let hasValidMarkers = false;
 
       groupRankings.forEach((group) => {
         if (!group.currentPositionLat || !group.currentPositionLng) {
-          console.warn(`Group ${group.groupName} (ID: ${group.groupId}) missing position data. Total distance: ${group.totalDistanceCovered.toFixed(2)} km`);
+          console.warn(
+            `Group ${group.groupName} (ID: ${
+              group.groupId
+            }) missing position data. Total distance: ${group.totalDistanceCovered.toFixed(
+              2
+            )} km`
+          );
           return;
         }
 
@@ -215,10 +233,22 @@ export const ChallengeMapView = ({
         pinElement.style.alignItems = "center";
         pinElement.style.gap = "2px";
 
-        const emoji = document.createElement("div");
-        emoji.innerHTML = "👥";
+        const emoji = document.createElement("img");
+        emoji.src = group.groupIconUrl ?? "👥";
         emoji.style.fontSize = "28px";
         emoji.style.lineHeight = "1";
+        emoji.alt = "Group Icon";
+        emoji.style.width = "36px"; // optional: set size
+        emoji.style.height = "36px"; // optional
+
+        const emojiFallback = document.createElement("div");
+        emojiFallback.innerHTML = "👥";
+        emojiFallback.style.fontSize = "28px";
+        emojiFallback.style.lineHeight = "1";
+
+        emoji.onerror = () => {
+          emoji.replaceWith(emojiFallback);
+        };
 
         const label = document.createElement("div");
         label.textContent = `#${group.rank}`;
@@ -237,7 +267,9 @@ export const ChallengeMapView = ({
           position: position,
           map: mapInstance.current,
           content: pinElement,
-          title: `${group.groupName} - ${group.totalDistanceCovered.toFixed(2)} km`,
+          title: `${group.groupName} - ${group.totalDistanceCovered.toFixed(
+            2
+          )} km`,
         });
 
         // Add info window
@@ -247,8 +279,12 @@ export const ChallengeMapView = ({
               👥 Group #${group.rank}
             </strong><br/>
             <strong>${group.groupName}</strong><br/>
-            Total Distance: <strong>${group.totalDistanceCovered.toFixed(2)} km</strong><br/>
-            Progress: <strong>${Math.min(group.progressPercentage, 100).toFixed(1)}%</strong><br/>
+            Total Distance: <strong>${group.totalDistanceCovered.toFixed(
+              2
+            )} km</strong><br/>
+            Progress: <strong>${Math.min(group.progressPercentage, 100).toFixed(
+              1
+            )}%</strong><br/>
             Members: <strong>${group.memberCount}</strong><br/>
             Lat: ${position.lat.toFixed(4)}<br/>
             Lng: ${position.lng.toFixed(4)}
@@ -268,7 +304,7 @@ export const ChallengeMapView = ({
         routePoints.forEach((point) => {
           bounds.extend({ lat: point.latitude, lng: point.longitude });
         });
-        
+
         mapInstance.current.fitBounds(bounds, {
           top: 50,
           bottom: 50,
@@ -314,18 +350,26 @@ export const ChallengeMapView = ({
           position: position,
           map: mapInstance.current,
           content: pinElement,
-          title: `${entry.firstName} ${entry.lastName} - ${entry.distanceCoveredKm.toFixed(2)} km`,
+          title: `${entry.firstName} ${
+            entry.lastName
+          } - ${entry.distanceCoveredKm.toFixed(2)} km`,
         });
 
         // Add info window
         const infoWindow = new google.maps.InfoWindow({
           content: `<div style="padding: 8px;">
-            <strong style="color: ${entry.isCurrentUser ? "#667eea" : "#333"}; font-size: 16px;">
+            <strong style="color: ${
+              entry.isCurrentUser ? "#667eea" : "#333"
+            }; font-size: 16px;">
               ${entry.isCurrentUser ? "🚴 You" : "👤"} #${entry.rank}
             </strong><br/>
             <strong>${entry.firstName} ${entry.lastName}</strong><br/>
-            Distance: <strong>${entry.distanceCoveredKm.toFixed(2)} km</strong><br/>
-            Progress: <strong>${entry.progressPercentage.toFixed(1)}%</strong><br/>
+            Distance: <strong>${entry.distanceCoveredKm.toFixed(
+              2
+            )} km</strong><br/>
+            Progress: <strong>${entry.progressPercentage.toFixed(
+              1
+            )}%</strong><br/>
             Lat: ${position.lat.toFixed(4)}<br/>
             Lng: ${position.lng.toFixed(4)}
           </div>`,
@@ -352,4 +396,3 @@ export const ChallengeMapView = ({
     </div>
   );
 };
-

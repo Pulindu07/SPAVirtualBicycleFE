@@ -298,6 +298,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .dashboard-header-section h1 {
@@ -311,12 +313,47 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .section-header h2 {
   margin: 0;
   font-size: 1.5rem;
   color: #333;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .dashboard-header-section {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 1.5rem;
+  }
+
+  .dashboard-header-section h1 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .section-header h2 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header-section h1 {
+    font-size: 1.25rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.1rem;
+  }
 }
 
 .btn-link {
@@ -343,11 +380,43 @@
   margin-top: 2rem;
 }
 
+/* Mobile */
+@media (max-width: 768px) {
+  .challenges-section,
+  .groups-section {
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .challenges-section,
+  .groups-section {
+    padding: 1rem;
+  }
+}
+
 .challenges-preview,
 .groups-preview {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .challenges-preview,
+  .groups-preview {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .challenges-preview,
+  .groups-preview {
+    grid-template-columns: 1fr;
+  }
 }
 
 .challenge-preview-card,
