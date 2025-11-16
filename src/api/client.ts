@@ -19,7 +19,7 @@ import type {
 } from "../types";
 
 const API_BASE_URL =
-  "https://virtualexerciseappbe-cvecdnfsfta0axd5.eastus2-01.azurewebsites.net/api";
+  import.meta.env.VITE_API_URL ?? "http://localhost:5288/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

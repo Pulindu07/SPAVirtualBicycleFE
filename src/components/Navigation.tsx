@@ -8,11 +8,7 @@ interface NavigationProps {
   onLogout: () => void;
 }
 
-export const Navigation = ({
-  userId,
-  isSuperAdmin,
-  onLogout,
-}: NavigationProps) => {
+export const Navigation = ({ userId, onLogout }: NavigationProps) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
