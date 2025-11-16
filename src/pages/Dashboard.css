@@ -220,15 +220,31 @@
   }
 }
 
+.sync-info-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
 .last-sync {
   text-align: center;
   color: #718096;
   font-size: 14px;
-  margin-top: 15px;
+  margin: 0;
 }
 
 /* Mobile */
 @media (max-width: 640px) {
+  .sync-info-container {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 15px;
+  }
+
   .last-sync {
     font-size: 12px;
   }

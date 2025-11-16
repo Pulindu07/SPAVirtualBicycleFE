@@ -205,7 +205,7 @@ export const Dashboard = () => {
             />
             <StatsCard
               title="Progress"
-              value={`${individualChallenge.progressPercentage.toFixed(1)}%`}
+              value={`${individualChallenge.progressPercentage.toFixed(2)}%`}
               icon="📊"
               color="#4facfe"
             />
@@ -224,12 +224,20 @@ export const Dashboard = () => {
               color="#43e97b"
             />
           </div>
-          {challengeProgress?.lastActivityDate && (
-            <p className="last-sync">
-              Last Synced:{" "}
-              {new Date(challengeProgress.lastActivityDate).toLocaleString()}
-            </p>
-          )}
+          <div className="sync-info-container">
+            {challengeProgress?.updatedAt && (
+              <p className="last-sync">
+                Last Synced:{" "}
+                {new Date(challengeProgress.updatedAt).toLocaleString()}
+              </p>
+            )}
+            {challengeProgress?.lastActivityDate && (
+              <p className="last-sync">
+                Previsous Ride:{" "}
+                {new Date(challengeProgress.lastActivityDate).toLocaleString()}
+              </p>
+            )}
+          </div>
         </div>
         <div className="map-section">
           <h2>Your Virtual Location</h2>
