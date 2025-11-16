@@ -10,6 +10,7 @@ import { Challenges } from "./pages/Challenges";
 import { ChallengeDetail } from "./pages/ChallengeDetail";
 import { Groups } from "./pages/Groups";
 import { RouteManagement } from "./pages/RouteManagement";
+import { CreateChallenge } from "./pages/CreateChallenge";
 import "./App.css";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/challenges/:id" element={<ChallengeDetail />} />
         <Route path="/groups" element={<Groups />} />
         <Route path="/routes" element={<RouteManagement />} />
+        <Route path="/create-challenge" element={<CreateChallenge />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

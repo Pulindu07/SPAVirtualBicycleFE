@@ -216,7 +216,8 @@ export const Challenges = () => {
                       setFormData({
                         ...formData,
                         challengeType: newType,
-                        groupIds: newType === "individual" ? [] : formData.groupIds,
+                        groupIds:
+                          newType === "individual" ? [] : formData.groupIds,
                       });
                     }}
                   >
@@ -334,7 +335,9 @@ export const Challenges = () => {
                         >
                           <input
                             type="checkbox"
-                            checked={formData.groupIds?.includes(group.id) || false}
+                            checked={
+                              formData.groupIds?.includes(group.id) || false
+                            }
                             onChange={() => handleGroupToggle(group.id)}
                             style={{ marginRight: "8px" }}
                           />
@@ -406,13 +409,17 @@ export const Challenges = () => {
                         <div className="stat">
                           <span className="stat-label">Target</span>
                           <span className="stat-value">
-                            {challenge.targetDistanceKm} km
+                            {challenge.targetDistanceKm.toFixed(2)} km
                           </span>
                         </div>
                         <div className="stat">
                           <span className="stat-label">Progress</span>
                           <span className="stat-value">
-                            {challenge.progressPercentage.toFixed(1)}%
+                            {Math.min(
+                              challenge.progressPercentage,
+                              100
+                            ).toFixed(0)}
+                            %
                           </span>
                         </div>
                         <div className="stat">
