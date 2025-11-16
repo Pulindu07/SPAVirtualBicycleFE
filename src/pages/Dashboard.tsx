@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { MapViewGoogleMaps as MapView } from "../components/MapViewGoogleMaps";
 import { StatsCard } from "../components/StatsCard";
 import { Navigation } from "../components/Navigation";
+import { UserGuide } from "../components/UserGuide";
 import { useRouteData } from "../hooks/useRouteData";
 import { useChallenges } from "../hooks/useChallenges";
 import { useGroups } from "../hooks/useGroups";
@@ -30,6 +31,7 @@ export const Dashboard = () => {
     useState<ChallengeProgress | null>(null);
   const [loadingChallengeProgress, setLoadingChallengeProgress] =
     useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   useEffect(() => {
     // Get userId from URL or localStorage
@@ -169,11 +171,24 @@ export const Dashboard = () => {
       />
       <div className="dashboard-content">
         <div className="dashboard-header-section">
-          <h1>🚴 Ceylon Virtual Rides</h1>
-          <button className="sync-btn" onClick={handleSync} disabled={syncing}>
-            {syncing ? "🔄 Syncing..." : "🔄 Sync Now"}
-          </button>
+          <div className="dashboard-header-right">
+            <button
+              className="sync-btn"
+              onClick={handleSync}
+              disabled={syncing}
+            >
+              {syncing ? "🔄 Syncing..." : "🔄 Sync Now"}
+            </button>
+            <button
+              className="help-btn"
+              onClick={() => setIsGuideOpen(true)}
+              title="View User Guide"
+            >
+              Guide
+            </button>
+          </div>
         </div>
+        <UserGuide isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
         <div className="stats-section">
           <h2 style={{ fontSize: "28px", marginBottom: "30px" }}>
             Welcome,{" "}
