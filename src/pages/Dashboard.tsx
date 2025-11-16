@@ -3,12 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { MapViewGoogleMaps as MapView } from "../components/MapViewGoogleMaps";
 import { StatsCard } from "../components/StatsCard";
 import { Navigation } from "../components/Navigation";
-import { useUserProgress } from "../hooks/useUserProgress";
 import { useRouteData } from "../hooks/useRouteData";
 import { useChallenges } from "../hooks/useChallenges";
 import { useGroups } from "../hooks/useGroups";
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../api/client";
+import type { ChallengeProgress } from "../types";
 import "./Dashboard.css";
 
 export const Dashboard = () => {
@@ -16,21 +16,25 @@ export const Dashboard = () => {
   const [searchParams] = useSearchParams();
   const [userId, setUserId] = useState<number | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [hasRefetched, setHasRefetched] = useState(false);
 
   const { isSuperAdmin } = useAuth(userId);
+  const { routePoints, loading: routeLoading } = useRouteData();
   const {
-    progress,
-    loading: progressLoading,
-    error: progressError,
-    refetch,
-  } = useUserProgress(userId);
-  const { routePoints, routeLength, loading: routeLoading } = useRouteData();
-  const { challenges, loading: challengesLoading } = useChallenges(userId);
+    challenges,
+    loading: challengesLoading,
+    refetch: refetchChallenges,
+  } = useChallenges(userId);
   const { groups, loading: groupsLoading } = useGroups(userId);
+  const [challengeProgress, setChallengeProgress] =
+    useState<ChallengeProgress | null>(null);
+  const [loadingChallengeProgress, setLoadingChallengeProgress] =
+    useState(false);
 
   useEffect(() => {
     // Get userId from URL or localStorage
     const userIdFromUrl = searchParams.get("userId");
+    const refresh = searchParams.get("refresh");
     const userIdFromStorage = localStorage.getItem("userId");
 
     if (userIdFromUrl) {
@@ -43,15 +47,83 @@ export const Dashboard = () => {
     } else {
       navigate("/");
     }
-  }, [searchParams, navigate]);
+
+    // If refresh parameter is present, refetch challenges
+    if (refresh === "true" && userIdFromStorage && !hasRefetched) {
+      setHasRefetched(true);
+      setTimeout(() => {
+        refetchChallenges();
+        navigate("/dashboard", { replace: true });
+      }, 500);
+    }
+  }, [searchParams, navigate, refetchChallenges, hasRefetched]);
+
+  // Redirect to create challenge if user has no challenges
+  // Only redirect if we're not in the process of refetching (hasRefetched is false or we just refetched)
+  useEffect(() => {
+    if (
+      !challengesLoading &&
+      userId &&
+      challenges.length === 0 &&
+      !hasRefetched
+    ) {
+      // Add a small delay to avoid race condition with refetch
+      const timer = setTimeout(() => {
+        if (challenges.length === 0) {
+          navigate("/create-challenge");
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [challenges, challengesLoading, userId, navigate, hasRefetched]);
+
+  // Get the individual challenge (first active in-progress individual challenge)
+  const individualChallenge = challenges.find(
+    (c) => c.challengeType === "individual"
+  );
+
+  // Fetch challenge progress for the individual challenge
+  useEffect(() => {
+    const fetchChallengeProgress = async () => {
+      if (individualChallenge && userId) {
+        try {
+          setLoadingChallengeProgress(true);
+          const progress = await api.getUserChallengeProgress(
+            individualChallenge.id,
+            userId
+          );
+          setChallengeProgress(progress);
+        } catch (err) {
+          console.error("Failed to fetch challenge progress:", err);
+          setChallengeProgress(null);
+        } finally {
+          setLoadingChallengeProgress(false);
+        }
+      } else {
+        setChallengeProgress(null);
+      }
+    };
+
+    fetchChallengeProgress();
+  }, [individualChallenge, userId]);
 
   const handleSync = async () => {
-    if (!userId) return;
+    if (!userId || !individualChallenge) return;
 
     try {
       setSyncing(true);
       await api.syncUserActivities(userId);
-      await refetch();
+      // Update challenge progress after sync
+      if (individualChallenge) {
+        await api.updateChallengeProgress(individualChallenge.id, userId);
+        // Refetch challenge progress
+        const progress = await api.getUserChallengeProgress(
+          individualChallenge.id,
+          userId
+        );
+        setChallengeProgress(progress);
+      }
+      await refetchChallenges();
       alert("Activities synced successfully!");
     } catch (error) {
       console.error("Sync failed:", error);
@@ -66,17 +138,11 @@ export const Dashboard = () => {
     navigate("/");
   };
 
-  const formatTime = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
-  };
-
   const formatDistance = (km: number): string => {
     return km.toFixed(2);
   };
 
-  if (progressLoading || routeLoading) {
+  if (routeLoading || challengesLoading || loadingChallengeProgress) {
     return (
       <div className="dashboard-container">
         <Navigation
@@ -89,23 +155,8 @@ export const Dashboard = () => {
     );
   }
 
-  if (progressError) {
-    return (
-      <div className="dashboard-container">
-        <Navigation
-          userId={userId}
-          isSuperAdmin={isSuperAdmin}
-          onLogout={handleLogout}
-        />
-        <div className="error-container">
-          <p>Error loading progress data</p>
-          <button onClick={() => navigate("/")}>Back to Login</button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!progress) {
+  if (!individualChallenge) {
+    navigate("/create-challenge");
     return null;
   }
 
@@ -126,62 +177,72 @@ export const Dashboard = () => {
         <div className="stats-section">
           <h2 style={{ fontSize: "28px", marginBottom: "30px" }}>
             Welcome,{" "}
-            {progress.firstName && progress.lastName
-              ? `${progress.firstName} ${progress.lastName}`
-              : progress.username}
+            {challengeProgress?.firstName && challengeProgress?.lastName
+              ? `${challengeProgress.firstName} ${challengeProgress.lastName}`
+              : challengeProgress?.username || "User"}
             ! 👋
           </h2>
           <div className="stats-grid">
             <StatsCard
               title="Distance Covered"
-              value={`${formatDistance(progress.totalDistanceKm)} km`}
+              value={`${formatDistance(
+                individualChallenge.totalDistanceCovered
+              )} km`}
               icon="📏"
               color="#667eea"
             />
             <StatsCard
               title="Remaining Distance"
               value={`${formatDistance(
-                Math.max(0, routeLength - progress.totalDistanceKm)
+                Math.max(
+                  0,
+                  individualChallenge.targetDistanceKm -
+                    individualChallenge.totalDistanceCovered
+                )
               )} km`}
               icon="🗺️"
               color="#38B2AC"
             />
             <StatsCard
-              title="Total Time"
-              value={formatTime(progress.totalMovingTimeSec)}
-              icon="⏱️"
-              color="#f093fb"
-            />
-            <StatsCard
               title="Progress"
-              value={`${progress.progressPercent.toFixed(1)}%`}
+              value={`${individualChallenge.progressPercentage.toFixed(1)}%`}
               icon="📊"
               color="#4facfe"
             />
             <StatsCard
-              title="Route Length"
-              value={`${routeLength.toFixed(0)} km`}
-              icon="🏝️"
+              title="Target Distance"
+              value={`${formatDistance(
+                individualChallenge.targetDistanceKm
+              )} km`}
+              icon="🎯"
+              color="#f093fb"
+            />
+            <StatsCard
+              title="Days Remaining"
+              value={`${individualChallenge.daysRemaining} days`}
+              icon="⏰"
               color="#43e97b"
             />
           </div>
-          <p className="last-sync">
-            Last synced: {new Date(progress.lastSync).toLocaleString()}
-          </p>
+          {challengeProgress?.lastActivityDate && (
+            <p className="last-sync">
+              Last Synced:{" "}
+              {new Date(challengeProgress.lastActivityDate).toLocaleString()}
+            </p>
+          )}
         </div>
-
         <div className="map-section">
           <h2>Your Virtual Location</h2>
           <MapView
             routePoints={routePoints}
-            progressPercent={progress.progressPercent}
-            coveredDistanceKm={progress.totalDistanceKm}
+            progressPercent={individualChallenge.progressPercentage}
+            coveredDistanceKm={individualChallenge.totalDistanceCovered}
           />
         </div>
 
-        <div className="challenges-section">
+        {/* <div className="challenges-section">
           <div className="section-header">
-            <h2>Your Challenges</h2>
+            <h2>Your Main Challenge</h2>
             <button
               className="btn-link"
               onClick={() => navigate("/challenges")}
@@ -196,26 +257,70 @@ export const Dashboard = () => {
               No challenges yet.{" "}
               <button
                 className="btn-link"
-                onClick={() => navigate("/challenges")}
+                onClick={() => navigate("/create-challenge")}
               >
-                Browse challenges
+                Create challenge
               </button>
             </div>
-          ) : (
-            <div className="challenges-preview">
-              {challenges.slice(0, 3).map((challenge) => (
-                <div
-                  key={challenge.id}
-                  className="challenge-preview-card"
-                  onClick={() => navigate(`/challenges/${challenge.id}`)}
-                >
-                  <h3>{challenge.name}</h3>
-                  <p>{challenge.progressPercentage.toFixed(1)}% complete</p>
+          ) : individualChallenge ? (
+            <div className="main-challenge-container">
+              <div
+                className="main-challenge-card"
+                onClick={() =>
+                  navigate(`/challenges/${individualChallenge.id}`)
+                }
+              >
+                <div className="challenge-header-main">
+                  <h3>{individualChallenge.name}</h3>
+                  <span
+                    className={`status-badge status-${individualChallenge.status}`}
+                  >
+                    {individualChallenge.status === "in_progress"
+                      ? "In Progress"
+                      : individualChallenge.status === "upcoming"
+                      ? "Upcoming"
+                      : "Completed"}
+                  </span>
                 </div>
-              ))}
+                {individualChallenge.description && (
+                  <p className="challenge-description">
+                    {individualChallenge.description}
+                  </p>
+                )}
+                <div className="challenge-stats-main">
+                  <div className="stat-item">
+                    <span className="stat-label">Progress</span>
+                    <span className="stat-value">
+                      {individualChallenge.progressPercentage.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Distance Covered</span>
+                    <span className="stat-value">
+                      {individualChallenge.totalDistanceCovered.toFixed(2)} km
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Target</span>
+                    <span className="stat-value">
+                      {individualChallenge.targetDistanceKm.toFixed(2)} km
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Days Remaining</span>
+                    <span className="stat-value">
+                      {individualChallenge.daysRemaining}
+                    </span>
+                  </div>
+                </div>
+                <div className="challenge-dates-main">
+                  {new Date(individualChallenge.startDate).toLocaleDateString()}{" "}
+                  - {new Date(individualChallenge.endDate).toLocaleDateString()}
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+          ) : null}
+        </div> */}
 
         <div className="groups-section">
           <div className="section-header">

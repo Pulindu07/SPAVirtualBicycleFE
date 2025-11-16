@@ -27,8 +27,8 @@ export const LoginPage = () => {
         <div className="login-header">
           <h1>🚴 Ceylon Virtual Rides</h1>
           <p className="subtitle">
-            Cycle virtually from Dondra Head to Point Pedro - 572 km through Sri
-            Lanka
+            Track your cycling progress, join challenges, and compete with
+            others on virtual routes through beautiful Sri Lanka
           </p>
         </div>
 
@@ -49,23 +49,27 @@ export const LoginPage = () => {
           <div className="feature-list">
             <div className="feature-item">
               <span className="feature-icon">📍</span>
-              <span>Visualize your progress on a map</span>
+              <span>Visualize your progress on interactive maps</span>
             </div>
             <div className="feature-item">
               <span className="feature-icon">📊</span>
-              <span>Track your distance and time</span>
+              <span>Track your distance, time, and progress</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">🏆</span>
+              <span>Join individual, group, and inter-group challenges</span>
             </div>
             <div className="feature-item">
               <span className="feature-icon">🔄</span>
               <span>Auto-sync with Strava every 2 hours</span>
             </div>
             <div className="feature-item">
-              <span className="feature-icon">🏝️</span>
-              <span>Journey 572 km from Dondra Head to Point Pedro</span>
+              <span className="feature-icon">🗺️</span>
+              <span>Explore multiple routes and virtual journeys</span>
             </div>
             <div className="feature-item">
               <span className="feature-icon">👥</span>
-              <span>Group activities now available</span>
+              <span>Compete with friends and groups</span>
             </div>
           </div>
 
