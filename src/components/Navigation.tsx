@@ -80,17 +80,15 @@ export const Navigation = ({
             >
               Groups
             </Link>
-            {isSuperAdmin && (
-              <Link
-                to="/routes"
-                className={
-                  location.pathname.startsWith("/routes") ? "active" : ""
-                }
-                onClick={closeMobileMenu}
-              >
-                Routes
-              </Link>
-            )}
+            <Link
+              to="/routes"
+              className={
+                location.pathname.startsWith("/routes") ? "active" : ""
+              }
+              onClick={closeMobileMenu}
+            >
+              Routes
+            </Link>
             <button className="nav-logout" onClick={onLogout}>
               Logout
             </button>

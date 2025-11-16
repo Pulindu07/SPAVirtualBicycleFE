@@ -32,10 +32,12 @@ export const RouteManagement = () => {
     // Wait for auth to finish loading before checking
     if (authLoading) return;
 
+    /*
     if (!isSuperAdmin) {
       navigate("/dashboard");
       return;
     }
+      */
     fetchRoutes();
   }, [isSuperAdmin, authLoading, navigate]);
 
@@ -123,14 +125,9 @@ export const RouteManagement = () => {
           isSuperAdmin={isSuperAdmin}
           onLogout={handleLogout}
         />
-        <div className="loading">Checking permissions...</div>
+        <div className="loading">Loading Routes...</div>
       </div>
     );
-  }
-
-  // Redirect if not super admin (handled by useEffect, but show message while redirecting)
-  if (!isSuperAdmin) {
-    return null;
   }
 
   return (
@@ -143,12 +140,14 @@ export const RouteManagement = () => {
       <div className="route-management-container">
         <div className="route-management-header">
           <h1>Route Management</h1>
-          <button
-            className="btn-primary"
-            onClick={() => setShowGenerateForm(!showGenerateForm)}
-          >
-            {showGenerateForm ? "Cancel" : "+ Generate Route"}
-          </button>
+          {isSuperAdmin && (
+            <button
+              className="btn-primary"
+              onClick={() => setShowGenerateForm(!showGenerateForm)}
+            >
+              {showGenerateForm ? "Cancel" : "+ Generate Route"}
+            </button>
+          )}
         </div>
 
         {showGenerateForm && (
