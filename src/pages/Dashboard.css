@@ -318,10 +318,42 @@
   gap: 1rem;
 }
 
+.dashboard-header-left {
+  flex: 1;
+}
+
+.dashboard-header-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
 .dashboard-header-section h1 {
   margin: 0;
   font-size: 2rem;
   color: #333;
+}
+
+.help-btn {
+  padding: 10px 20px;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  background: white;
+  color: #667eea;
+}
+
+.help-btn:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .section-header {
@@ -347,9 +379,25 @@
     margin-bottom: 1.5rem;
   }
 
+  .dashboard-header-left {
+    width: 100%;
+  }
+
+  .dashboard-header-right {
+    width: 100%;
+    justify-content: flex-end; /* ✅ Correct CSS value */
+    flex-wrap: wrap;
+    margin-left: 0;
+  }
+
   .dashboard-header-section h1 {
     font-size: 1.5rem;
     text-align: center;
+  }
+
+  .help-btn {
+    flex: 1;
+    min-width: 120px;
   }
 
   .section-header {
@@ -369,6 +417,11 @@
 
   .section-header h2 {
     font-size: 1.1rem;
+  }
+
+  .help-btn {
+    padding: 8px 16px;
+    font-size: 12px;
   }
 }
 

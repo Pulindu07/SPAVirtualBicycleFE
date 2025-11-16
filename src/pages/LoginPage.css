@@ -148,6 +148,40 @@
   color: #718096;
 }
 
+.guide-link-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: transparent;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.guide-link-btn:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.guide-link-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .guide-link-btn {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+}
+
 .error-message {
   margin: 20px 30px 0;
   padding: 12px 16px;

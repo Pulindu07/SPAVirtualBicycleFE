@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
+import { UserGuide } from "../components/UserGuide";
 import "./LoginPage.css";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const error = searchParams.get("error");
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -84,8 +86,16 @@ export const LoginPage = () => {
             We only access your cycling activities. Your data is secure and
             private.
           </p>
+
+          <button
+            className="guide-link-btn"
+            onClick={() => setIsGuideOpen(true)}
+          >
+            How It Works❓ - User Guide
+          </button>
         </div>
       </div>
+      <UserGuide isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
     </div>
   );
 };

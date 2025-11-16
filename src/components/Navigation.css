@@ -100,6 +100,23 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
+.nav-help {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  font-size: inherit;
+}
+
+.nav-help:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
 .nav-logout {
   background-color: rgba(255, 255, 255, 0.2);
   color: white;
@@ -203,6 +220,7 @@
   }
 
   .nav-links a,
+  .nav-help,
   .nav-logout {
     width: 100%;
     padding: 1rem;
