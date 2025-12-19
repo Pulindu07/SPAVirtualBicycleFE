@@ -232,16 +232,21 @@ export const Dashboard = () => {
               icon="🎯"
               color="#f093fb"
             />
-            <StatsCard
-              title="Days Remaining"
-              value={`${individualChallenge.daysRemaining} days`}
-              icon="⏰"
-              color="#43e97b"
-            />
+            {individualChallenge.status === "in_progress" && (
+              <StatsCard
+                title="Days Remaining"
+                value={`${individualChallenge.daysRemaining} days`}
+                icon="⏰"
+                color="#43e97b"
+              />
+            )}
             {individualChallenge.status === "completed" && (
               <StatsCard
                 title="Completed On"
-                value={`${challengeProgress?.lastActivityDate && new Date(challengeProgress.lastActivityDate).toLocaleString()}`}
+                value={`${
+                  challengeProgress?.lastActivityDate &&
+                  new Date(challengeProgress.lastActivityDate).toLocaleString()
+                }`}
                 icon="🏁"
                 color="#43e97b"
               />
