@@ -145,14 +145,12 @@ export const Challenges = () => {
     }
   };
 
-  const getStatusBadge = (challenge: any) => {
-    const now = new Date();
-    const start = new Date(challenge.startDate);
-    const end = new Date(challenge.endDate);
-
-    if (now < start) return { text: "Upcoming", class: "status-upcoming" };
-    if (now > end) return { text: "Completed", class: "status-completed" };
-    return { text: "In Progress", class: "status-in-progress" };
+  const formatText = (text: string) => {  
+    if(text === "in_progress") return "In Progress";
+    else if(text === "upcoming") return "Upcoming";
+    else if(text === "completed") return "Completed";
+    else if(text === "not_completed") return "Not Completed";
+    return text;
   };
 
   if (!userId) {
@@ -376,7 +374,6 @@ export const Challenges = () => {
               </div>
             ) : (
               challenges.map((challenge) => {
-                const status = getStatusBadge(challenge);
                 return (
                   <div
                     key={challenge.id}
@@ -385,8 +382,8 @@ export const Challenges = () => {
                   >
                     <div className="challenge-header">
                       <h3>{challenge.name}</h3>
-                      <span className={`status-badge ${status.class}`}>
-                        {status.text}
+                      <span className={`status-badge status-in_progress`}>
+                        {formatText(challenge.status)}
                       </span>
                     </div>
                     <div className="challenge-card-content">

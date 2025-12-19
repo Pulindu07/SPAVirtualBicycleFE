@@ -241,7 +241,7 @@ export const Dashboard = () => {
             {individualChallenge.status === "completed" && (
               <StatsCard
                 title="Completed On"
-                value={`${challengeProgress?.lastActivityDate} days`}
+                value={`${challengeProgress?.lastActivityDate && new Date(challengeProgress.lastActivityDate).toLocaleString()}`}
                 icon="🏁"
                 color="#43e97b"
               />
