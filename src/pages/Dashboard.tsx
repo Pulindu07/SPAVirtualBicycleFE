@@ -238,6 +238,14 @@ export const Dashboard = () => {
               icon="⏰"
               color="#43e97b"
             />
+            {individualChallenge.status === "completed" && (
+              <StatsCard
+                title="Completed On"
+                value={`${challengeProgress?.lastActivityDate} days`}
+                icon="🏁"
+                color="#43e97b"
+              />
+            )}
           </div>
           <div className="sync-info-container">
             {challengeProgress?.updatedAt && (

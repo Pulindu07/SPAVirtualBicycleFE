@@ -248,6 +248,12 @@ export const ChallengeDetail = () => {
               🏁 {new Date(challenge.endDate).toLocaleDateString()}
             </div>
           </div>
+          {challenge.status === "completed" && (
+            <div className="info-card">
+              <div className="info-label">Status</div>
+              <div className="info-value">🏁 Completed</div>
+            </div>
+          )}
         </div>
 
         {challenge.challengeType === "inter-group" ? (
