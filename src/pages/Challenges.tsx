@@ -382,7 +382,7 @@ export const Challenges = () => {
                   >
                     <div className="challenge-header">
                       <h3>{challenge.name}</h3>
-                      <span className={`status-badge status-in_progress`}>
+                      <span className={`status-badge status-in-progress`}>
                         {formatText(challenge.status)}
                       </span>
                     </div>
