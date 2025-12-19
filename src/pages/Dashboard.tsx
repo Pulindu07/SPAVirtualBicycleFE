@@ -201,7 +201,7 @@ export const Dashboard = () => {
             <StatsCard
               title="Challenge"
               value={`${
-                individualChallenge.description
+                individualChallenge.name
               }`}
               icon="🗺️"
               color="#66dfeaff"
