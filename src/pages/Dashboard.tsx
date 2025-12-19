@@ -245,7 +245,7 @@ export const Dashboard = () => {
                 title="Completed On"
                 value={`${
                   challengeProgress?.lastActivityDate &&
-                  new Date(challengeProgress.lastActivityDate).toLocaleString()
+                  new Date(challengeProgress.lastActivityDate).toLocaleDateString()
                 }`}
                 icon="🏁"
                 color="#43e97b"
