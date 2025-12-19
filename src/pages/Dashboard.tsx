@@ -199,6 +199,14 @@ export const Dashboard = () => {
           </h2>
           <div className="stats-grid">
             <StatsCard
+              title="Challenge"
+              value={`${
+                individualChallenge.description
+              }`}
+              icon="🗺️"
+              color="#66dfeaff"
+            />
+            <StatsCard
               title="Distance Covered"
               value={`${formatDistance(
                 individualChallenge.totalDistanceCovered
