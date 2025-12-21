@@ -81,7 +81,7 @@ export const Dashboard = () => {
 
   // Get the individual challenge (first active in-progress individual challenge)
   const individualChallenge = challenges.find(
-    (c) => c.challengeType === "individual"
+    (c) => c.status === "in_progress" && c.challengeType === "individual"
   );
 
   // Fetch challenge progress for the individual challenge
