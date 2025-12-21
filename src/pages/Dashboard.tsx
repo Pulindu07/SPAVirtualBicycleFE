@@ -25,7 +25,13 @@ export const Dashboard = () => {
     loading: challengesLoading,
     refetch: refetchChallenges,
   } = useChallenges(userId);
-  const { routePoints, loading: routeLoading } = useRouteData(challenges[0]?.routeId);
+
+  // Get the individual challenge (first active in-progress individual challenge)
+  const individualChallenge = challenges.find(
+    (c) => c.challengeType === "individual"
+  );
+  console.log("Individual Challenge:", individualChallenge?.routeId);
+  const { routePoints, loading: routeLoading } = useRouteData(individualChallenge?.routeId);
   const { groups, loading: groupsLoading } = useGroups(userId);
   const [challengeProgress, setChallengeProgress] =
     useState<ChallengeProgress | null>(null);
@@ -78,11 +84,6 @@ export const Dashboard = () => {
       return () => clearTimeout(timer);
     }
   }, [challenges, challengesLoading, userId, navigate, hasRefetched]);
-
-  // Get the individual challenge (first active in-progress individual challenge)
-  const individualChallenge = challenges.find(
-    (c) => c.status === "in_progress" && c.challengeType === "individual"
-  );
 
   // Fetch challenge progress for the individual challenge
   useEffect(() => {
@@ -200,9 +201,7 @@ export const Dashboard = () => {
           <div className="stats-grid">
             <StatsCard
               title="Challenge"
-              value={`${
-                individualChallenge.name
-              }`}
+              value={`${individualChallenge.name}`}
               icon="🗺️"
               color="#66dfeaff"
             />
@@ -253,7 +252,9 @@ export const Dashboard = () => {
                 title="Completed On"
                 value={`${
                   challengeProgress?.lastActivityDate &&
-                  new Date(challengeProgress.lastActivityDate).toLocaleDateString()
+                  new Date(
+                    challengeProgress.lastActivityDate
+                  ).toLocaleDateString()
                 }`}
                 icon="🏁"
                 color="#43e97b"
