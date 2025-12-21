@@ -30,7 +30,6 @@ export const Dashboard = () => {
   const individualChallenge = challenges.find(
     (c) => c.challengeType === "individual"
   );
-  console.log("Individual Challenge:", individualChallenge?.routeId);
   const { routePoints, loading: routeLoading } = useRouteData(individualChallenge?.routeId);
   const { groups, loading: groupsLoading } = useGroups(userId);
   const [challengeProgress, setChallengeProgress] =

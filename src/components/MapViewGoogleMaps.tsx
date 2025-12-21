@@ -69,7 +69,7 @@ export const MapViewGoogleMaps = ({
 
       return () => clearInterval(checkGoogleMaps);
     }
-  }, []);
+  }, [routePoints]);
 
   // Draw route polylines
   useEffect(() => {
