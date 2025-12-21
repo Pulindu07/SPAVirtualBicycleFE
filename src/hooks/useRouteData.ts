@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { api } from "../api/client";
 import type { RoutePoint } from "../types";
 
-export const useRouteData = () => {
+export const useRouteData = (routeId?: number) => {
   const [routePoints, setRoutePoints] = useState<RoutePoint[]>([]);
   const [routeLength, setRouteLength] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -14,8 +14,8 @@ export const useRouteData = () => {
         setLoading(true);
         setError(null);
         const [points, length] = await Promise.all([
-          api.getRoutePoints(),
-          api.getRouteLength(),
+          api.getRoutePoints(routeId),
+          api.getRouteLength(routeId),
         ]);
         setRoutePoints(points);
         setRouteLength(length);
@@ -28,7 +28,7 @@ export const useRouteData = () => {
     };
 
     fetchRouteData();
-  }, []);
+  }, [routeId]);
 
   return { routePoints, routeLength, loading, error };
 };
