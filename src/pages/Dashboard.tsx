@@ -20,12 +20,12 @@ export const Dashboard = () => {
   const [hasRefetched, setHasRefetched] = useState(false);
 
   const { isSuperAdmin } = useAuth(userId);
-  const { routePoints, loading: routeLoading } = useRouteData();
   const {
     challenges,
     loading: challengesLoading,
     refetch: refetchChallenges,
   } = useChallenges(userId);
+  const { routePoints, loading: routeLoading } = useRouteData(challenges[0]?.routeId);
   const { groups, loading: groupsLoading } = useGroups(userId);
   const [challengeProgress, setChallengeProgress] =
     useState<ChallengeProgress | null>(null);
