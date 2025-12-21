@@ -9,13 +9,13 @@ export const useRouteData = (routeId?: number) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchRouteData = async () => {
+    const fetchRouteData = async (route: number | undefined) => {
       try {
         setLoading(true);
         setError(null);
         const [points, length] = await Promise.all([
-          api.getRoutePoints(routeId),
-          api.getRouteLength(routeId),
+          api.getRoutePoints(route),
+          api.getRouteLength(route),
         ]);
         setRoutePoints(points);
         setRouteLength(length);
@@ -27,7 +27,7 @@ export const useRouteData = (routeId?: number) => {
       }
     };
 
-    fetchRouteData();
+    fetchRouteData(routeId);
   }, [routeId]);
 
   return { routePoints, routeLength, loading, error };
