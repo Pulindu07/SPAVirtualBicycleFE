@@ -37,11 +37,16 @@ export const UserGuide = ({ isOpen, onClose }: UserGuideProps) => {
               <div className="guide-step">
                 <div className="step-number">2</div>
                 <div className="step-content">
-                  <h4>Sync Your Activities</h4>
+                  <h4>Activities Sync Automatically</h4>
                   <ul>
                     <li>
-                      The app will fetch your Strava cycling activities every 2
-                      hours
+                      As soon as you save a ride, Strava notifies the app via a
+                      webhook and your activity appears within seconds — no
+                      action needed
+                    </li>
+                    <li>
+                      If something looks missing, you can still hit
+                      "🔄 Sync Now" on the dashboard to force a refresh
                     </li>
                   </ul>
                 </div>
@@ -121,12 +126,37 @@ export const UserGuide = ({ isOpen, onClose }: UserGuideProps) => {
             <h3>🔄 How Syncing Works</h3>
             <div className="sync-info">
               <div className="sync-item">
-                <strong>Automatic Sync:</strong>
-                <p>Your activities sync automatically every 2 hours</p>
+                <strong>Webhook (Primary):</strong>
+                <p>
+                  When you save a ride in Strava, Strava sends a webhook event
+                  to the app. The activity is fetched, saved, and your
+                  dashboard / challenge progress updates within seconds — no
+                  polling, no waiting.
+                </p>
+              </div>
+              <div className="sync-item">
+                <strong>Daily Safety Net:</strong>
+                <p>
+                  A background job runs once a day at 03:00 UTC to backfill
+                  anything missed during a Strava or app outage. You should
+                  rarely notice this.
+                </p>
               </div>
               <div className="sync-item">
                 <strong>Manual Sync:</strong>
-                <p>Click "🔄 Sync Now" anytime for immediate updates</p>
+                <p>
+                  Click "🔄 Sync Now" on the dashboard or a challenge page if
+                  you still do not see a recent ride. Manual sync is now a
+                  fallback rather than the main path.
+                </p>
+              </div>
+              <div className="sync-item">
+                <strong>Edits &amp; Deletes:</strong>
+                <p>
+                  If you edit a ride's distance or delete it in Strava, the
+                  webhook updates or removes it here too — totals and
+                  challenge progress recompute automatically.
+                </p>
               </div>
               <div className="sync-item">
                 <strong>What Gets Synced:</strong>
@@ -184,6 +214,35 @@ export const UserGuide = ({ isOpen, onClose }: UserGuideProps) => {
                   <li>Activities must be GPS-tracked (not manual entries)</li>
                   <li>Only "Ride" activities count toward distance</li>
                   <li>Activities must have distance &gt; 0 km</li>
+                  <li>
+                    If a ride saved in Strava more than a few minutes ago is
+                    still missing, click "🔄 Sync Now" to force a refresh
+                  </li>
+                </ul>
+              </div>
+              <div className="trouble-item">
+                <strong>
+                  Challenge map shows "No route configured for this challenge"?
+                </strong>
+                <ul>
+                  <li>
+                    The challenge was created without a route attached. Ask the
+                    challenge creator (or an admin) to assign a route to it
+                  </li>
+                  <li>
+                    Your distance and progress still count — only the map view
+                    is hidden
+                  </li>
+                </ul>
+              </div>
+              <div className="trouble-item">
+                <strong>Re-authorize Strava if syncing stops</strong>
+                <ul>
+                  <li>
+                    If you revoke access in your Strava settings, the app will
+                    deactivate your account and stop syncing. Sign in again
+                    with Strava to restore the connection
+                  </li>
                 </ul>
               </div>
             </div>

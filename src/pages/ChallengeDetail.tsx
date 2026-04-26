@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   useChallenge,
@@ -6,10 +6,10 @@ import {
   useInterGroupLeaderboard,
 } from "../hooks/useChallenges";
 import { useAuth } from "../hooks/useAuth";
+import { useRouteData } from "../hooks/useRouteData";
 import { api } from "../api/client";
 import { Navigation } from "../components/Navigation";
 import { ChallengeMapView } from "../components/ChallengeMapView";
-import type { RoutePoint } from "../types";
 import "./ChallengeDetail.css";
 
 export const ChallengeDetail = () => {
@@ -33,40 +33,13 @@ export const ChallengeDetail = () => {
     refetch: refetchInterGroup,
   } = useInterGroupLeaderboard(challengeId, userId || undefined);
   const [syncing, setSyncing] = useState(false);
-  const [routePoints, setRoutePoints] = useState<RoutePoint[]>([]);
-  const [routeLoading, setRouteLoading] = useState(true);
 
-  // Fetch route points for the challenge
-  useEffect(() => {
-    const fetchRoutePoints = async () => {
-      if (!challenge?.routeId) {
-        // Use default route if no routeId specified
-        try {
-          setRouteLoading(true);
-          const points = await api.getRoutePoints();
-          setRoutePoints(points);
-        } catch (error) {
-          console.error("Failed to fetch route points:", error);
-        } finally {
-          setRouteLoading(false);
-        }
-      } else {
-        try {
-          setRouteLoading(true);
-          const points = await api.getRoutePoints(challenge.routeId);
-          setRoutePoints(points);
-        } catch (error) {
-          console.error("Failed to fetch route points:", error);
-        } finally {
-          setRouteLoading(false);
-        }
-      }
-    };
-
-    if (challenge) {
-      fetchRoutePoints();
-    }
-  }, [challenge]);
+  // Fetch route points for this challenge only. If the challenge has no routeId,
+  // do NOT fall back to the global default route — show the empty state instead.
+  const { routePoints, loading: routeLoading } = useRouteData(
+    challenge?.routeId ?? undefined,
+    { allowDefaultFallback: false }
+  );
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -402,15 +375,18 @@ export const ChallengeDetail = () => {
           leaderboard.entries.length > 0) ||
           (challenge.challengeType === "inter-group" &&
             interGroupLeaderboard &&
-            interGroupLeaderboard.groupRankings.length > 0 &&
-            routePoints.length > 0)) && (
+            interGroupLeaderboard.groupRankings.length > 0)) && (
           <div className="challenge-map-section">
             <h2>
               {challenge.challengeType === "inter-group"
                 ? "Groups on Map"
                 : "Participants on Map"}
             </h2>
-            {routeLoading || interGroupLoading ? (
+            {!challenge.routeId ? (
+              <div className="empty-state">
+                No route configured for this challenge
+              </div>
+            ) : routeLoading || interGroupLoading ? (
               <div className="loading">Loading map...</div>
             ) : routePoints.length > 0 ? (
               challenge.challengeType === "inter-group" ? (

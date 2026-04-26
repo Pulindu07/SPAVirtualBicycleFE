@@ -51,17 +51,26 @@ export const api = {
   },
 
   // Route
-  getRoutePoints: async (routeId?: number): Promise<RoutePoint[]> => {
+  getRoutePoints: async (
+    routeId?: number,
+    signal?: AbortSignal
+  ): Promise<RoutePoint[]> => {
     const params = routeId ? { routeId } : {};
-    const response = await apiClient.get<RoutePoint[]>("/route", { params });
+    const response = await apiClient.get<RoutePoint[]>("/route", {
+      params,
+      signal,
+    });
     return response.data;
   },
 
-  getRouteLength: async (routeId?: number): Promise<number> => {
+  getRouteLength: async (
+    routeId?: number,
+    signal?: AbortSignal
+  ): Promise<number> => {
     const params = routeId ? { routeId } : {};
     const response = await apiClient.get<{ lengthKm: number }>(
       "/route/length",
-      { params }
+      { params, signal }
     );
     return response.data.lengthKm;
   },
